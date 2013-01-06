@@ -9,8 +9,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -178,84 +180,7 @@ public class SimpleDTMC implements DTMC {
 		fOut.close();	
 	}
 	
-	public void toPrismModel(String path) throws IOException {
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
-		fOut.println("dtmc");
-		fOut.println("module test");
-		fOut.println("\ts : [0.."+(this.transitionMatrix.length-1)+"];\n");
-		for(int i=0;i<this.transitionMatrix.length;i++){
-			String ret="\t[] s="+i+" -> ";
-			for(int j=0;j<this.transitionMatrix[i].length;j++){
-				if(this.transitionMatrix[i][j]>0){
-					ret=ret+this.transitionMatrix[i][j]+" : (s'="+j+") + ";
-				}
-			}
-			if(ret.endsWith(" + ")){
-				ret=ret.substring(0,ret.length()-3)+";";
-				fOut.println(ret);
-			}
-		}
-		fOut.println("endmodule");
-		fOut.close();
-	}
-	
-	public void toPrismProperty(String path, int from, int to) throws Exception{
-		if(from>=this.transitionMatrix.length||to>=this.transitionMatrix.length){
-			throw new Exception("Wrong indexes");
-		}
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
-		fOut.println("P=? [F s="+to+" {s="+from+"}]");
-		fOut.close();
-	}
 
-	public void toSharpeModel(String path) throws FileNotFoundException{
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
-		fOut.println("markov test");
-		for(int i=0;i<this.transitionMatrix.length;i++){
-			for(int j=0;j<this.transitionMatrix[i].length;j++){
-				if(this.transitionMatrix[i][j]>0){
-					if(i!=j){
-						fOut.println("s"+i+" s"+j+" "+this.transitionMatrix[i][j]);
-					}else{
-						fOut.println("s"+i+" s"+j+"b "+this.transitionMatrix[i][j]);
-						fOut.println("s"+i+"b s"+j+" 1");
-					}
-				}
-			}
-		}
-		fOut.println("end");
-		fOut.println("s0 1");
-		fOut.println("end");
-		fOut.close();
-	}
-	
-	public void toMRMCModel(String name,int from, int to) throws FileNotFoundException{
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(name+".tra"));
-		fOut.println("STATES "+this.transitionMatrix.length);
-		String ret="";
-		int count=0;
-		for(int i=0;i<this.transitionMatrix.length;i++){
-			for(int j=0;j<this.transitionMatrix[i].length;j++){
-				if(this.transitionMatrix[i][j]>0){
-					count++;
-					ret=ret+(i+1)+" "+(j+1)+" "+this.transitionMatrix[i][j]+"\n";
-				}
-			}
-		}
-		fOut.println("TRANSITIONS "+count);
-		fOut.println(ret);
-		fOut.close();
-		fOut=new PrintWriter(new FileOutputStream(name+".lab"));
-		fOut.println("#DECLARATION\ninit goal\n#END\n"+(from+1)+" init\n"+(to+1)+" goal");
-		fOut.close();
-		fOut=new PrintWriter(new FileOutputStream(name+".input"));
-		fOut.println("set error_bound 1.0e-15");
-		fOut.println("P{>0}[tt U goal]");
-		fOut.println("$RESULT["+(from+1)+"]");
-		fOut.println("quit");
-		fOut.close();
-	}
-	
 	
 	public SmartMatrix getSmartMatrix(){
 		if(this.smartMatrix==null){
@@ -292,6 +217,7 @@ public class SimpleDTMC implements DTMC {
 		SmartMatrix sm2=new SmartMatrix(smd2,variableRows);
 		for(int i=0;i<this.transitionMatrix.length-this.numTransients;i++){
 			sm=sm.minor(this.transitionMatrix.length-i-1, this.transitionMatrix.length-i-1);
+			System.out.println(Arrays.deepToString(sm.getBase()));
 		}
 		MatlabBatch mb = new MatlabBatch();
 		String deta=sm.determinant(mb);
@@ -308,6 +234,7 @@ public class SimpleDTMC implements DTMC {
 ;
 
 		String num="";
+
 		for(int i=0;i<this.numTransients;i++){	
 			//if(this.transitionMatrix[from][i]==0) continue;
 			int coef=(int)Math.pow(-1, from+i);
@@ -346,6 +273,7 @@ public class SimpleDTMC implements DTMC {
 			org.nfunk.jep.Node ap = myParser.preprocess(a0);
 			org.nfunk.jep.Node a= myParser.simplify(ap);
 			simpl=myParser.toString(a);
+			System.out.println(simpl);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -418,62 +346,6 @@ public class SimpleDTMC implements DTMC {
 		fOut.close();
 		return st.size();
 	}
-
-	public int mathematica(String fileName,double comparison,int from, int to, int ... variableRows) throws IOException{
-		assert(to>=this.numTransients);
-
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(fileName+".nb"));
-		fOut.print("Q:=SparseArray[{");
-		String tmp="";
-		for(int i=0;i<this.numTransients;i++){
-			for(int j=0;j<this.numTransients;j++){
-				boolean var=false;
-				for(int v:variableRows){
-					if(v==i){
-						var=true;
-						break;
-					}
-				}
-				if(this.transitionMatrix[i][j]>0){
-					if(var){
-						tmp=tmp+"{"+(i+1)+","+(j+1)+"}->v"+(i+1)+"c"+(j+1)+",";
-					}else{
-						tmp=tmp+"{"+(i+1)+","+(j+1)+"}->"+this.transitionMatrix[i][j]+",";
-					}
-				}
-			}
-		}
-		tmp=tmp.substring(0,tmp.length()-1);
-		fOut.print(tmp);
-		tmp="";
-		fOut.println("},{"+this.numTransients+","+this.numTransients+"}]");
-		fOut.println("I0:=IdentityMatrix["+this.numTransients+"]");
-		fOut.print("R0:=SparseArray[{");
-		for(int i=0;i<this.numTransients;i++){
-			for(int j=this.numTransients;j<this.transitionMatrix.length;j++){
-				boolean var=false;
-				for(int v:variableRows){
-					if(v==i){
-						var=true;
-						break;
-					}
-				}
-				if(this.transitionMatrix[i][j]>0){
-					if(var){
-						tmp=tmp+"{"+(i+1)+","+(j+1)+"}->v"+(i+1)+"c"+(j+1)+",";
-					}else{
-						tmp=tmp+"{"+(i+1)+","+(j+1)+"}->"+this.transitionMatrix[i][j]+",";
-					}
-				}
-			}
-		}
-		fOut.println("},{"+this.numTransients+","+(this.transitionMatrix.length-this.numTransients)+"}]");
-		//fOut.println("B0:=Timing[Inverse[I0-Q].R0]");
-		//fOut.println("B0{{1,2}}//MatrixForm");
-		fOut.close();
-		return 0;
-	}
-
 	
 	public String simplify(String in){
 		XJep myParser = new XJep();
@@ -535,213 +407,6 @@ public class SimpleDTMC implements DTMC {
 			return "MANNAGGIALIGUAI";
 		}
 	}
-	
-	public int variableMatlab(String path, String diary, int from, int to, int ... variableRows) throws FileNotFoundException{
-		assert(to>=this.numTransients);
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
-		fOut.println("format long;");
-		fOut.println("st=cputime;");
-		fOut.print("Q=sym('[");
-		int vCount=0;
-		String initialValues="";
-		for(int i=0;i<this.numTransients;i++){
-			for(int j=0;j<this.numTransients;j++){
-				boolean iIsVariable=false;
-				for(int a=0;a<variableRows.length;a++){
-					if(variableRows[a]==i){
-						iIsVariable=true;
-						break;
-					}
-				}
-				if(iIsVariable && this.transitionMatrix[i][j]>0){
-					fOut.print("v"+(vCount)+" ");
-					initialValues=initialValues+"v"+vCount+"="+this.transitionMatrix[i][j]+"\n";
-					vCount++;
-				}else{
-					fOut.print(this.transitionMatrix[i][j]+" ");
-				}
-			}
-			if(i<this.numTransients-1)
-				fOut.print(";");
-		}
-		fOut.println("]');");
-		fOut.print("R=sym('[");
-		for(int i=0;i<this.numTransients;i++){
-			for(int j=this.numTransients;j<this.transitionMatrix[i].length;j++){
-				boolean iIsVariable=false;
-				for(int a=0;a<variableRows.length;a++){
-					if(variableRows[a]==i){
-						iIsVariable=true;
-						break;
-					}
-				}
-				if(iIsVariable && this.transitionMatrix[i][j]>0){
-					fOut.print("v"+(vCount)+" ");
-					initialValues=initialValues+"v"+vCount+"="+this.transitionMatrix[i][j]+"\n";
-					vCount++;
-				}else{
-					fOut.print(this.transitionMatrix[i][j]+" ");
-				}
-			}
-			if(i<this.numTransients-1)
-				fOut.print(";");
-		}
-		fOut.println("]');");
-		fOut.println("B=inv(eye("+this.numTransients+")-Q)*R;");
-		fOut.println("diary "+diary);
-		fOut.println(initialValues);
-		fOut.println("func2java=B("+(from+1)+","+(to-this.numTransients+1)+")");
-		fOut.println("diary off");
-		fOut.println("result=subs(func2java)");
-		fOut.println("exTime=cputime-st");
-		fOut.close();
-		return vCount;
-	}
-	
-	public int variableMaxima(String path,int from, int to, int ... variableRows) throws FileNotFoundException{
-		assert(to>=this.numTransients);
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
-		fOut.print("Q:matrix(");
-		int vCount=0;
-		String initialValues="";
-		for(int i=0;i<this.numTransients;i++){
-			fOut.print("[");
-			for(int j=0;j<this.numTransients;j++){
-				boolean iIsVariable=false;
-				for(int a=0;a<variableRows.length;a++){
-					if(variableRows[a]==i){
-						iIsVariable=true;
-						break;
-					}
-				}
-				if(iIsVariable && this.transitionMatrix[i][j]>0){
-					fOut.print("v"+(vCount));
-					initialValues=initialValues+"v"+vCount+":"+this.transitionMatrix[i][j]+";\n";
-					vCount++;
-				}else{
-					fOut.print(this.transitionMatrix[i][j]);
-				}
-				if(j<this.numTransients-1){
-					fOut.print(",");
-				}
-			}
-			if(i<this.numTransients-1)
-				fOut.print("],");
-		}
-		fOut.println("]);");
-		fOut.print("R:matrix(");
-		for(int i=0;i<this.numTransients;i++){
-			fOut.print("[");
-			for(int j=this.numTransients;j<this.transitionMatrix[i].length;j++){
-				boolean iIsVariable=false;
-				for(int a=0;a<variableRows.length;a++){
-					if(variableRows[a]==i){
-						iIsVariable=true;
-						break;
-					}
-				}
-				if(iIsVariable && this.transitionMatrix[i][j]>0){
-					fOut.print("v"+(vCount));
-					initialValues=initialValues+"v"+vCount+":"+this.transitionMatrix[i][j]+";\n";
-					vCount++;
-				}else{
-					fOut.print(this.transitionMatrix[i][j]);
-				}
-				if(j<this.transitionMatrix[i].length-1){
-					fOut.print(",");
-				}
-			}
-			if(i<this.numTransients-1)
-				fOut.print("],");
-		}
-		fOut.println("]);");
-		fOut.println("B:invert(ident("+this.numTransients+")-Q)*R;");
-		fOut.println(initialValues);
-		fOut.println("ev(B(1,1),FLOAT");
-		/*fOut.println("diary "+diary);
-		fOut.println(initialValues);
-		fOut.println("func2java=B("+(from+1)+","+(to-this.numTransients+1)+")");
-		fOut.println("diary off");
-		fOut.println("result=subs(func2java)");
-		fOut.println("exTime=cputime-st");*/
-		fOut.close();
-		return vCount;
-	}
-	
-	public void basicMatlab(String path, int from, int to) throws FileNotFoundException{
-		assert(to>=this.numTransients);
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
-		fOut.println("format long;");
-		fOut.println("st=cputime;");
-		fOut.print("Q=[");
-		for(int i=0;i<this.numTransients;i++){
-			for(int j=0;j<this.numTransients;j++){
-				fOut.print(this.transitionMatrix[i][j]+" ");
-			}
-			if(i<this.numTransients-1)
-				fOut.print(";");
-		}
-		fOut.println("];");
-		fOut.print("R=[");
-		for(int i=0;i<this.numTransients;i++){
-			for(int j=this.numTransients;j<this.transitionMatrix[i].length;j++){
-				fOut.print(this.transitionMatrix[i][j]+" ");
-			}
-			if(i<this.numTransients-1)
-				fOut.print(";");
-		}
-		fOut.println("];");
-		fOut.println("B=inv(eye("+this.numTransients+")-Q)*R;");
-		fOut.println("result=B("+(from+1)+","+(to+1-this.numTransients)+")");
-		fOut.println("exTime=cputime-st");
-		fOut.close();
-	}
-	
-	public void toBlockNonParametricMatlab(String path, int blockSize, int from, int to) throws FileNotFoundException{
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
-		fOut.println("st=cputime;");
-		int maxLen=blockSize;
-		for(int a=0;a<this.numTransients;a+=maxLen){
-			for(int b=0;b<this.numTransients;b+=maxLen){
-				fOut.print("Q"+a+"_"+b+"=sym('[");
-				for(int i=a;i<a+maxLen && i<this.numTransients;i++){
-					for(int j=b;j<b+maxLen && j<this.numTransients;j++){
-						if(j<b+maxLen-1 && j<this.numTransients-1){
-							fOut.print(this.transitionMatrix[i][j]+",");
-						}else{
-							fOut.print(this.transitionMatrix[i][j]);
-						}
-					}
-					if(i<a+maxLen-1 && i<this.numTransients-1){
-						fOut.print(";");
-					}
-				}
-				fOut.println("]');");
-			}
-		}
-		//System.out.println("Carmelo");
-		fOut.print("Q=[");
-		for(int a=0;a<this.numTransients;a+=maxLen){
-			for(int b=0;b<this.numTransients;b+=maxLen){
-				fOut.print("Q"+a+"_"+b+" ");
-			}
-			//Check
-			if(a+maxLen<this.numTransients){
-				fOut.print(";");
-			}
-		}
-		//System.out.println("Gelsomino");
-		fOut.println("];");
-		fOut.println("fprintf(1,'MatrixLoaded')");
-		fOut.println("N=inv(eye("+this.numTransients+")-Q);");
-		/*fOut.println("M=W;");
-		fOut.println("M("+(to+1)+",:)=[];");
-		fOut.println("M(:,"+(from+1)+")=[];");
-		fOut.println("result=det(M)/det(W)");*/
-		fOut.println("extime=cputime-st");
-		fOut.close();
-	}
-
 
 	public void setNumTransitionRow(int row,int numTrans,int minCol, int maxCol,int seed){
 		double sum=0.0;
@@ -776,9 +441,8 @@ public class SimpleDTMC implements DTMC {
 		}
 	}
 	
-
-	public void toTransTable(String path) throws FileNotFoundException{
-		PrintWriter fOut=new PrintWriter(new FileOutputStream(path));
+	public void toTransTable(OutputStream os) {
+		PrintWriter fOut=new PrintWriter(os);
 		for(int i=0;i<this.transitionMatrix.length;i++){
 			for(int j=0;j<this.transitionMatrix[i].length;j++){
 				fOut.print(this.transitionMatrix[i][j]+"\t");
@@ -786,5 +450,10 @@ public class SimpleDTMC implements DTMC {
 			fOut.println();
 		}
 		fOut.close();
+	}
+	public void toTransTable(String path) throws FileNotFoundException{
+		FileOutputStream fOut = new FileOutputStream(path);
+		toTransTable(fOut);
+		
 	}
 }

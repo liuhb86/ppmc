@@ -29,8 +29,9 @@ public class Exp1 {
 		int i=0;
 		Random seedGen=new Random(6597524);
 		for(int avg=10;avg<=10;avg+=2){
-			for(int numComponents=50;numComponents<=1000;){
-				for(int sample=0;sample<3;sample++){
+			//for(int numComponents=50;numComponents<=1000;){
+			for(int numComponents=50;numComponents<=50;){
+				for(int sample=0;sample<1;sample++){
 					Callable<String> worker = new SimpleGeneratorS("exp1c"+numComponents+"s"+sample, completed, numComponents, numAbsorbing, avg, Math.floor(avg/4), 0, numComponents-numAbsorbing,2, seedGen.nextInt(),false,true);
 					i++;
 					Future<String> submit = executor.submit(worker);

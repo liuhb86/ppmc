@@ -24,41 +24,6 @@ public class SmartMatrix  extends Thread{
 	private String prefix="";
 	private String postfix="";
 	private String matlabAssign="";
-	/**
-	 * @param args
-	 * @throws IOException 
-	 * @throws NumberFormatException 
-	 */
-	public static void main(String[] args) throws NumberFormatException, IOException{
-		double error=0;
-		Random r=new Random();
-		double[][] smb={{0.1,0.1,0.1},{0.43,0.62,0.87},{0.92,0.53,0.82}};
-		SmartMatrix sm1=new SmartMatrix(smb,0,1,2);
-		//System.out.println(sm1.determinant());
-		//System.out.println(sm1.getMatlabAssign());
-		
-		for(int i=1;false && i<2;i++){
-			int size=1000;//r.nextInt(999)+1;
-			int avg=15;//Math.max((int)size/2, r.nextInt(size+1));
-			int stddev=5;//r.nextInt(Math.max(1, (int)(size/2)));
-			System.out.println("AVG: "+avg+"\tSTDDEV: "+stddev+"\tDENSITY: "+((double)avg/size));
-			double[][] test1=SmartMatrix.randomSparseSquaredMatrix01Normal(size, avg, stddev);
-			Matrix m=new Matrix(test1);
-			SmartMatrix sm= new SmartMatrix(test1);
-			long start=System.currentTimeMillis();
-			double detI=Double.parseDouble(sm.determinant(null));
-			long stop=System.currentTimeMillis();
-			System.out.println("Internal computation ("+size+"): "+(stop-start));
-			System.out.println("Internal result: "+detI);
-			start=System.currentTimeMillis();
-			double detM=sm.solveMatlab();
-			stop=System.currentTimeMillis();
-			System.out.println("Matlab computation ("+size+"): "+(stop-start));
-			System.out.println("Results:\n"+detI+"\t"+detM+"\nError: "+Math.abs(detI-detM)+"\nJama: "+m.det());
-			error+=Math.abs(detI-detM);
-		}
-		System.out.println("average error: "+(error/1000));
-	}
 	
 	public static double[][] randomSquaredMatrix01(int size){
 		double[][] ret = new double[size][size];
@@ -245,7 +210,7 @@ public class SmartMatrix  extends Thread{
 		return -1;
 	}
 	
-	public String determinant(MatlabBatch mb) throws IOException{
+	public String determinant(Object mb) throws IOException{
 		//System.out.println("Computing det. Size: "+this.base.length);
 		int row=this.getSymbolicLine();
 		if(row>=this.base.length){
@@ -255,16 +220,9 @@ public class SmartMatrix  extends Thread{
 			if(this.base.length==0){
 				return "(1)";
 			}else{
-				if(mb==null){
 					//System.out.println("Computing determinant internally");
 					Matrix m=new Matrix(this.base);
 					return "("+m.det()+")";
-				}else{
-					String placeholder=mb.getUniqueId();
-					//System.out.println("Adding determinant computation to Matlab "+placeholder);
-					mb.addMatrix(placeholder, this.base);
-					return "("+placeholder+")";
-				}
 			}
 		}else{
 			String ret="";
@@ -290,97 +248,7 @@ public class SmartMatrix  extends Thread{
 	public String getMatlabAssign(){
 		return ""+this.matlabAssign;
 	}
-	
-	public String determinant1() throws IOException{
-		//System.out.println("Computing det. Size: "+this.base.length);
-		int row=this.getSymbolicLine();
-		if(row==-1){
-			if(this.base.length==0){
-				return "1";
-			}else{
-				//check
-				if(true || this.base.length<SmartMatrix.MIN_NUM_SPLIT_SIZE){
-					if(this.base.length<this.MIN_MATLAB_SIZE){
-						Matrix m=new Matrix(this.base);
-						return ""+m.det();
-					}else{
-						return ""+this.solveMatlab();
-					}
-				}else{
-					ArrayList<SmartMatrix> workers = new ArrayList<SmartMatrix>();
-					ArrayList<Double> coefs = new ArrayList<Double>();
-					for(int i=0;i<this.base[0].length;i++){
-						if(this.base[0][i]==0) continue;
-						int coef=(int)Math.pow(-1, i);
-						coefs.add(new Double(this.base[0][i]*coef));
-						SmartMatrix temp = this.minor(0, i);
-						temp.start();
-						workers.add(temp);
-					}
-					double result=0.0;
-					while(!workers.isEmpty()){
-						SmartMatrix temp = workers.get(0);
-						if(!temp.getDeterminant().equals("")){
-							result=result+Double.parseDouble(temp.getDeterminant())*coefs.get(0).doubleValue();
-						}else{
-							try {
-								temp.join();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-					return ""+result;
-				}
-			}
-		}else{
-			String ret="";
-			if(this.base.length<SmartMatrix.MIN_SPLIT_SIZE){
-				//SERIAL EXECUTION
-				for(int i=0;i<this.base[row].length;i++){
-					if(this.base[row][i]==0) continue;
-					int coef=(int)Math.pow(-1, i+row);
-					if(coef<0) ret=ret+"("+coef+")*";				
-					if(this.base[row][i]==1){
-						ret=ret+"("+this.minor(row, i).determinant(null)+")";
-					}else{
-						ret=ret+this.indexes[row][i]+"*("+this.minor(row, i).determinant(null)+")+";
-					}
-				}
-			}else{
-				//PARALLELIZE 
-				ArrayList<SmartMatrix> workers = new ArrayList<SmartMatrix>();
-				for(int i=0;i<this.base[row].length;i++){
-					if(this.base[row][i]==0) continue;
-					int coef=(int)Math.pow(-1, i+row);
-					System.out.println("XXXXXXXXXX");
-					String pref=this.indexes[row][i]+"*(";
-					if(coef<0) pref="("+coef+")*"+pref;
-					SmartMatrix temp = this.minor(row, i);
-					temp.setPrefix(pref);
-					temp.setPostfix(")");
-					temp.start();
-					workers.add(temp);
-				}
-				while(!workers.isEmpty()){
-					SmartMatrix temp = workers.get(0);
-					if(!temp.getDeterminant().equals("")){
-						ret=ret+temp.getPrefix()+temp.getDeterminant()+temp.getPostfix()+"+";
-						workers.remove(0);
-					}else{
-						try {
-							temp.join();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-			return (ret.length()>0)?ret.substring(0,ret.length()-1):"0";
-		}
-	}
-	
-	
+
 	public SmartMatrix minor(int r,int c){
 		double[][] par=new double[this.base.length-1][this.base.length-1];
 		String[][] ind=new String[this.base.length-1][this.base.length-1];
@@ -430,57 +298,5 @@ public class SmartMatrix  extends Thread{
 			return -1;
 		}
 		return this.vars[0];
-	}
-	
-	public double solveMatlab(){
-		PrintWriter fOut;
-		//System.out.println("matlab");
-		try {
-			String temp="dsma"+Math.abs((int)(System.currentTimeMillis()*System.nanoTime()))+".m";
-			fOut = new PrintWriter(new FileOutputStream(temp));
-			fOut.println("format long;");
-			fOut.println("Q=sparse("+this.base.length+","+this.base.length+");");
-			for(int i=0;i<this.base.length;i++){
-				for(int j=0;j<this.base[i].length;j++){
-					if(this.base[i][j]!=0)
-						fOut.println("Q("+(i+1)+","+(j+1)+")="+this.base[i][j]+";");
-				}
-			}
-			fOut.println("result=det(Q)");
-			fOut.println("clear all;");
-			fOut.println("quit");
-			fOut.close();
-
-			String launcher="launcher"+((int)Math.random())+System.currentTimeMillis()+".m";
-			PrintWriter fOut1=new PrintWriter(new FileOutputStream(launcher));
-			fOut1.println(temp.substring(0,temp.length()-2));
-			fOut1.close();
-			Process p = Runtime.getRuntime().exec("matlab < "+launcher);
-			BufferedReader input =new BufferedReader(new InputStreamReader(p.getInputStream()));
-			StringBuffer sb=new StringBuffer();
-			String line;
-			double resultd=-1;
-			int state=0;//1->wait for result; 3->wait for extime
-			while ((line = input.readLine()) != null) {
-				//System.out.println(line);
-				if(line.trim().startsWith("result =") && state==0){
-					state=1;
-					continue;
-				}
-				if(state==1  && line.trim().length()>0){
-					String result=line.trim();
-					resultd=Double.parseDouble(result);
-					state=2;
-					continue;
-				}
-			}
-			(new File(launcher)).delete();
-			(new File(temp)).delete();
-			//System.out.println("matlabComplete");
-			return resultd;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return -1;
 	}
 }
