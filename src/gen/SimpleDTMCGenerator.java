@@ -5,6 +5,9 @@ import mat.SparseMatrix;
 import util.Random;
 import core.SimpleDTMC;
 
+/**
+ * @author Hongbo Liu <liuhongbo@pku.edu.cn, liuhb86@gmail.com>
+ */
 public class SimpleDTMCGenerator {
 	public double mean;
 	public double stddev;

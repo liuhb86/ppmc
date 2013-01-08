@@ -1,6 +1,5 @@
 package mat;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map.Entry;
@@ -102,12 +101,7 @@ public class SmartMatrix {
 	
 	public void run(){
 		String temp="";
-		try {
-			temp = this.determinant();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		temp = this.determinant();
 		synchronized(this.det){
 			this.det=temp;
 		}
@@ -165,7 +159,7 @@ public class SmartMatrix {
 	public int getDimC() {
 		return this.base[0].length;
 	}
-	public String determinant() throws IOException{
+	public String determinant() {
 		//System.out.println("Computing det. Size: "+this.base.length);
 		int row=this.getSymbolicLine();
 		if(row>=this.base.length){

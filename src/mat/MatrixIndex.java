@@ -1,5 +1,7 @@
 package mat;
 
+import util.Utils;
+
 public class MatrixIndex implements Comparable<MatrixIndex>{
 	public final int row;
 	public final int col;
@@ -17,5 +19,15 @@ public class MatrixIndex implements Comparable<MatrixIndex>{
 		if (col>o.col) return 1;
 		
 		return 0;
+	}
+	
+	public boolean equals(Object o) {
+		if (o==null || !(o instanceof MatrixIndex)) return false;
+		MatrixIndex t = (MatrixIndex) o;
+		return (row == t.row && col ==t.col);
+	}
+	
+	public int hashCode() {
+		return Utils.hashPair(row, col);
 	}
 }

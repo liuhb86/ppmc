@@ -1,6 +1,3 @@
-/**
- * 
- */
 package gen;
 
 
@@ -11,18 +8,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
+
+import solver.SimpleReachabilitySolver;
 import util.Random;
 
 import core.SimpleDTMC;
+
 /**
  * @author Antonio Filieri
- *
  */
 public class SimpleGeneratorS implements Callable<String>{
 	public static final double MAXERROR=10e-10;
 	public static final int NTHREDS=2;
-	private boolean USEDB=false;
-	private boolean JUSTGENERATE=true;
 	public static final int NUMRTSAMPLE=10;
 	private SimpleDTMC res;
 	private int numStates;
@@ -30,9 +27,6 @@ public class SimpleGeneratorS implements Callable<String>{
 
 	private int numVars;
 	private String runID;
-	private String prismPath="path to prism";
-	private String mrmcPath="path to mrmc";
-	private String matlabPath="path matlab";
 	private int from;
 	private int to;
 	private int[] completed;
@@ -42,8 +36,6 @@ public class SimpleGeneratorS implements Callable<String>{
 	
 	
 	public SimpleGeneratorS(String runId,int[] completed,int numStates,int numAbsorbing,double mean, double stddev,int from, int to,int numVars,int seed ,boolean usedb,boolean generate){
-		this.USEDB=usedb;
-		this.JUSTGENERATE=generate;
 		this.runID=runId;
 		this.completed=completed;
 		this.numStates=numStates;
@@ -75,7 +67,9 @@ public class SimpleGeneratorS implements Callable<String>{
 		String ret=this.runID;
 		
 			long letSee=System.currentTimeMillis();
-			res.unsimplified(this.runID+"Du",0,from, to);
+			SimpleReachabilitySolver solver = new SimpleReachabilitySolver(res);
+			String result = solver.solve(from, to);
+			System.out.println(result);
 			long designTime=(System.currentTimeMillis()-letSee)/1000;
 			PrintWriter fOut=new PrintWriter(new FileOutputStream(this.runID+"DT.log"));
 			try{
@@ -124,7 +118,7 @@ public class SimpleGeneratorS implements Callable<String>{
 			}
 		}
 		long end=System.nanoTime();
-		File delL=new File(launcher);
+		new File(launcher);
 		//delL.delete();
 		ret[2]=(double)(end-begin);
 		input.close();

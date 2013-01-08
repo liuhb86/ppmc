@@ -32,7 +32,7 @@ public class Exp1 {
 			//for(int numComponents=50;numComponents<=1000;){
 			for(int numComponents=10;numComponents<=10;){
 				for(int sample=0;sample<1;sample++){
-					Callable<String> worker = new SimpleGeneratorS("exp1c"+numComponents+"s"+sample, completed, numComponents, numAbsorbing, avg, Math.floor(avg/4), 0, numComponents-numAbsorbing,3, seedGen.nextInt(),false,true);
+					Callable<String> worker = new SimpleGeneratorS("exp1c"+numComponents+"s"+sample, completed, numComponents, numAbsorbing, avg, 2, 0, numComponents-numAbsorbing,3, seedGen.nextInt(),false,true);
 					i++;
 					Future<String> submit = executor.submit(worker);
 					list.add(submit);
