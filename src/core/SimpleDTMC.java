@@ -11,12 +11,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.io.DataOutputStream;
 
 import org.lsmp.djep.djep.DJep;
@@ -29,56 +31,31 @@ import org.nfunk.jep.ParseException;
 import org.nfunk.jep.SimpleNode;
 import org.nfunk.jep.SymbolTable;
 
-import mat.MatlabBatch;
+import util.Utils;
+
+import mat.MatrixIndex;
 import mat.SmartMatrix;
+import mat.SparseMatrix;
 
 /**
  * @author Antonio Filieri
  *
  */
 public class SimpleDTMC implements DTMC {
-	double[][] transitionMatrix;
+	SmartMatrix trans;
 	int currentState;
 	int numTransients;
-	private SmartMatrix smartMatrix=null;
+	private SmartMatrix M=null;
 	
 	public SimpleDTMC(double[][] transitionMatrix,int numTransients){
-		this(transitionMatrix,numTransients,0);
+		this(transitionMatrix, new SparseMatrix<String>(), numTransients,0);
 	}
 	
-	public SimpleDTMC(double[][] transitionMatrix,int numTransients,int initial){
+	public SimpleDTMC(double[][] transitionMatrix, SparseMatrix<String> var,int numTransients,int initial){
 		this.currentState=initial;
-		this.transitionMatrix=transitionMatrix;
 		this.numTransients=numTransients;
+		this.trans = new SmartMatrix(transitionMatrix,var);
 	}
-	
-	public SimpleDTMC(double[][] transientMatrix,double[][] absorbingMatrix){
-		this(transientMatrix,absorbingMatrix,0);
-	}
-	
-	public SimpleDTMC(double[][] transientMatrix,double[][] absorbingMatrix,int initial){
-		this.currentState=initial;
-		this.numTransients=transientMatrix.length;
-		this.transitionMatrix=new double[transientMatrix.length+absorbingMatrix[0].length][transientMatrix.length+absorbingMatrix[0].length];
-		for(int i=0;i<transientMatrix.length+absorbingMatrix[0].length;i++){
-			for(int j=0;j<transientMatrix.length+absorbingMatrix[0].length;j++){
-				if(i<transientMatrix.length){
-					if(j<transientMatrix.length){
-						this.transitionMatrix[i][j]=transientMatrix[i][j];
-					}else{
-						this.transitionMatrix[i][j]=absorbingMatrix[i][j-transientMatrix.length];
-					}
-				}else{
-					if(i==j){
-						this.transitionMatrix[i][j]=1.0;
-					}else{
-						this.transitionMatrix[i][j]=0.0;
-					}
-				}
-			}
-		}
-	}
-	
 	
 	/* (non-Javadoc)
 	 * @see core.DTMC#getCurrentNode()
@@ -86,24 +63,6 @@ public class SimpleDTMC implements DTMC {
 	@Override
 	public Node getCurrentNode() {
 		return new Node("n"+this.currentState,this.currentState);
-	}
-
-	/* (non-Javadoc)
-	 * @see core.DTMC#getOutgoingTrans(core.Node)
-	 */
-	@Override
-	public Transition[] getOutgoingTrans(Node n) {
-		int pos=n.getId();
-		ArrayList<Transition> out = new ArrayList<Transition>();
-		for(int i=0;i<this.transitionMatrix.length;i++){
-			if(this.transitionMatrix[pos][i]>0){
-				Node[] from=new Node[1];
-				from[0]=new Node("n"+pos,pos);
-				out.add(new Transition(from,new Node("n"+i,i),this.transitionMatrix[pos][i]));
-			}
-		}
-		Transition[] t = new Transition[out.size()];
-		return out.toArray(t);
 	}
 
 	/* (non-Javadoc)
@@ -121,12 +80,12 @@ public class SimpleDTMC implements DTMC {
 	public void move(double dice) {
 		if(this.isAbsorbed()) return;
 		double cum=0.0;
-		for(int a=0;a<this.transitionMatrix[this.currentState].length;a++){
-			if(dice<cum+this.transitionMatrix[this.currentState][a]){
+		for(int a=0;a<trans.getDimC();a++){
+			if(dice<cum+trans.getNumericEntry(currentState, a)){
 				this.currentState=a;
 				break;
 			}
-			cum+=this.transitionMatrix[this.currentState][a];
+			cum+=trans.getNumericEntry(currentState, a);
 		}
 	}
 
@@ -141,7 +100,7 @@ public class SimpleDTMC implements DTMC {
 	@Override
 	public Node[] getNodeSet() {
 		ArrayList<Node> ret = new ArrayList<Node>();
-		for(int i=0;i<this.transitionMatrix.length;i++){
+		for(int i=0;i<trans.getDim();i++){
 			ret.add(new Node("n"+i,i));
 		}
 		Node[] n =new Node[ret.size()];
@@ -156,10 +115,10 @@ public class SimpleDTMC implements DTMC {
 		this.currentState=fIn.readInt();
 		this.numTransients=fIn.readInt();
 		int size=fIn.readInt();
-		this.transitionMatrix=new double[size][size];
+		this.trans = new SmartMatrix(new double[size][size]);
 		for(int i=0;i<size;i++){
 			for(int j=0;j<size;j++){
-				this.transitionMatrix[i][j]=fIn.readDouble();
+				trans.getBase()[i][j]=fIn.readDouble();
 			}
 		}
 		fIn.close();
@@ -171,56 +130,50 @@ public class SimpleDTMC implements DTMC {
 		fOut.writeChar('S');
 		fOut.writeInt(this.currentState);
 		fOut.writeInt(this.numTransients);
-		fOut.writeInt(this.transitionMatrix.length);
-		for(int i=0;i<this.transitionMatrix.length;i++){
-			for(int j=0;j<this.transitionMatrix[i].length;j++){
-				fOut.writeDouble(this.transitionMatrix[i][j]);
+		fOut.writeInt(trans.getDim());
+		for(int i=0;i<trans.getDimR();i++){
+			for(int j=0;j<trans.getDimC();j++){
+				fOut.writeDouble(trans.getNumericEntry(i, j));
 			}
 		}
 		fOut.close();	
 	}
 	
-
-	
-	public SmartMatrix getSmartMatrix(){
-		if(this.smartMatrix==null){
-			double smd[][]=new double[this.transitionMatrix.length][this.transitionMatrix.length];
-			for(int i=0;i<this.transitionMatrix.length;i++){
-				for(int j=0;j<this.transitionMatrix.length;j++){
-					smd[i][j]=(i==j)?1-this.transitionMatrix[i][j]:-1*this.transitionMatrix[i][j];
-				}
-			}
-			this.smartMatrix=new SmartMatrix(smd);
-		}
-		return this.smartMatrix;
+	public void writeTo(Object printer) {
+		PrintWriter writer = Utils.getWriter(printer);
+		if (writer == null) return;
+		writer.println("Transitions:");
+		trans.writeTo(writer);
+		writer.println("Initial:");
+		writer.print('\t');
+		writer.println(this.currentState);
+		writer.flush();
 	}
 	
-	public int unsimplified(String fileName,double comparison,int from, int to, int ... variableRows) throws IOException{
+	public SmartMatrix getM(){
+		if(this.M==null){
+			double smd[][]=new double[numTransients][numTransients];
+			SparseMatrix<String> vars = trans.getVars().clone();
+			for(int i=0;i<numTransients;i++){
+				for(int j=0;j<numTransients;j++){
+					if (trans.isSymbolicEntry(i, j)) {
+						vars.put(i, j, ((i==j)? "1":"") + "-(" +trans.getEntry(i, j, true)+")");
+						smd[i][j] = -1;
+					} else {
+						smd[i][j]=((i==j)?1:0)-trans.getNumericEntry(i, j);
+					}
+				}
+			}
+			this.M=new SmartMatrix(smd,vars);
+		}
+		return this.M;
+	}
+	
+	public int unsimplified(String fileName,double comparison,int from, int to) throws IOException{
 		assert(to>=this.numTransients);
 
-		double smd[][]=new double[this.transitionMatrix.length][this.transitionMatrix.length];
-		double smd2[][]=new double[this.transitionMatrix.length][this.transitionMatrix.length];
-		for(int i=0;i<this.transitionMatrix.length;i++){
-			for(int j=0;j<this.transitionMatrix.length;j++){
-				if(i<this.numTransients && j<this.numTransients){
-					smd[i][j]=(i==j)?1-this.transitionMatrix[i][j]:-1*this.transitionMatrix[i][j];
-					smd2[i][j]=(i==j)?1-this.transitionMatrix[i][j]:-1*this.transitionMatrix[i][j];
-				}else{
-					smd[i][j]=this.transitionMatrix[i][j];
-					smd2[i][j]=this.transitionMatrix[i][j];
-				}
-				//System.out.print(smd[i][j]+"\t");
-			}
-			//System.out.println();
-		}
-		SmartMatrix sm=new SmartMatrix(smd,variableRows);
-		SmartMatrix sm2=new SmartMatrix(smd2,variableRows);
-		for(int i=0;i<this.transitionMatrix.length-this.numTransients;i++){
-			sm=sm.minor(this.transitionMatrix.length-i-1, this.transitionMatrix.length-i-1);
-			System.out.println(Arrays.deepToString(sm.getBase()));
-		}
-		MatlabBatch mb = new MatlabBatch();
-		String deta=sm.determinant(mb);
+		SmartMatrix sm= this.getM();
+		String deta=sm.determinant();
 		PrintWriter fOut=new PrintWriter(new FileOutputStream(fileName+".c"));
 		fOut.println("#include <stdio.h>");
 		fOut.println("#include <time.h>");
@@ -236,32 +189,16 @@ public class SimpleDTMC implements DTMC {
 		String num="";
 
 		for(int i=0;i<this.numTransients;i++){	
-			//if(this.transitionMatrix[from][i]==0) continue;
-			int coef=(int)Math.pow(-1, from+i);
-			boolean variable=false;
-			for(int k=0;k<variableRows.length;k++){
-				if(variableRows[k]==i){
-					variable=true;
-					break;
-				}
-			}
-			SmartMatrix mino=sm.minor(i, from);
-			String print="";
-			String invComp=(i==to)?"1-":"(-1)*";
-			if(!variable || (this.transitionMatrix[i][to]==0)){
-				if(this.transitionMatrix[i][to]!=0){
-					num=num+"+"+"("+coef+")*("+mino.determinant(mb)+")*("+this.transitionMatrix[i][to]+")";
-				}
-			}else{
-				//System.out.println("USATO NUMERICO BAH");
-				num=num+"+"+"("+coef+")*("+mino.determinant(mb)+")*("+sm2.getIndex(i, to)+")";
+			if(trans.getNumericEntry(i, to)!=0){
+				char coef=(from+i)%2==0?'+':'-';
+				SmartMatrix mino=sm.minor(i, from);
+				num=num+coef+"("+mino.determinant()+")*"+trans.getEntry(i, to, true);
 			}
 		}
-		String both="("+num.substring(1)+")/("+deta+")";
-
+		String both="("+num+")/("+deta+")";
+		System.out.println(both);
 		/*System.out.println("STARTING MATLAB COMPUTATION");
 		long timeS = System.currentTimeMillis();*/
-		mb.compute();
 		//System.out.println("MATLAB COMPUTATION took "+(System.currentTimeMillis()-timeS)+" millis.");
 		
 		
@@ -293,34 +230,19 @@ public class SimpleDTMC implements DTMC {
 			}
 			//endpos--;
 			String variable=function.substring(vpos,endpos);
-			double val=sm2.valFromIndex(variable);
 			if(!varsRemapping.containsKey(variable)){
 				varsRemapping.put(variable, "x["+count+"]");
-				varsAssignment.put("x["+count+"]", val);
+				varsAssignment.put("x["+count+"]", 0.0);
 				count++;
 			}
 			function=function.substring(0,vpos)+varsRemapping.get(variable)+function.substring(endpos);
 		}
 
-		HashMap<String,Double> mc = mb.getResults();
 		/*System.out.println(function);
 		for(String k1 : mc.keySet()){
 			System.out.println(k1+" = "+mc.get(k1));
 		}*/
-		System.out.println("LAST COUNTER: "+mb.getCounter()+"\t\tCURRENT SIZE: "+mc.size());
-		while(function.contains("m")){
-			int vpos=function.indexOf("m");
-			int endpos=vpos+1;
-			while(function.charAt(endpos)<='9' && function.charAt(endpos)>='0'){
-				endpos++;
-			}
-			//endpos--;
-			String variable=function.substring(vpos,endpos);
-			System.out.println(variable);
-			double val=mc.get(variable);
-			
-			function=function.substring(0,vpos)+val+function.substring(endpos);
-		}
+		
 		function = function.replace("+-", "-");
 		function = function.replace("-+", "-");
 		function = function.replace("++", "+");
@@ -407,45 +329,12 @@ public class SimpleDTMC implements DTMC {
 			return "MANNAGGIALIGUAI";
 		}
 	}
-
-	public void setNumTransitionRow(int row,int numTrans,int minCol, int maxCol,int seed){
-		double sum=0.0;
-		int count=0;
-		Random rgen;
-		if(seed==-1){
-			rgen=new Random();
-		}else{
-			rgen=new Random(seed);
-		}
-		for(int o=0;o<this.transitionMatrix[row].length;o++){
-			this.transitionMatrix[row][o]=0;
-		}
-		while(sum<=0.0 || count<numTrans){
-			int next=Math.max(0, minCol)+rgen.nextInt(Math.min(this.transitionMatrix[row].length,maxCol)-Math.max(0, minCol));	
-			if(this.transitionMatrix[row][next]==0){
-				double x=rgen.nextDouble();
-				if(x<0 || x>1){
-					//throw new Exception("Porca l'oca");
-				}
-				while(x<=0 || (x==1 && row==next)){
-					x=rgen.nextDouble();
-				}
-				this.transitionMatrix[row][next]=x;
-				count++;
-				sum+=x;
-			}
-		}
-		for(int o=0;o<this.transitionMatrix[row].length;o++){
-			this.transitionMatrix[row][o]=this.transitionMatrix[row][o]/sum;
-			//System.out.println(this.transitionMatrix[row][o]);
-		}
-	}
 	
 	public void toTransTable(OutputStream os) {
 		PrintWriter fOut=new PrintWriter(os);
-		for(int i=0;i<this.transitionMatrix.length;i++){
-			for(int j=0;j<this.transitionMatrix[i].length;j++){
-				fOut.print(this.transitionMatrix[i][j]+"\t");
+		for(int i=0;i<trans.getDimR();i++){
+			for(int j=0;j<trans.getDimC();j++){
+				fOut.print(trans.getEntry(i, j)+"\t");
 			}
 			fOut.println();
 		}

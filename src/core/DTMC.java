@@ -14,8 +14,6 @@ public interface DTMC {
 	
 	public boolean isAbsorbed();
 	
-	public Transition[] getOutgoingTrans(Node n);
-	
 	public Node getCurrentNode();
 	
 	public void move(double dice);

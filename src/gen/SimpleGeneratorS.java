@@ -29,7 +29,6 @@ public class SimpleGeneratorS implements Callable<String>{
 	private int numAbsorbing;
 
 	private int numVars;
-	private int[] rws=null;
 	private String runID;
 	private String prismPath="path to prism";
 	private String mrmcPath="path to mrmc";
@@ -58,7 +57,8 @@ public class SimpleGeneratorS implements Callable<String>{
 		} else {
 			this.generator = new SimpleDTMCGenerator(mean,stddev, rand.nextLong());
 		}
-		this.res = this.generator.generate(numStates, numAbsorbing);
+		this.res = this.generator.generate(numStates, numAbsorbing, numVars);
+		this.res.writeTo(System.out);
 	}
 	
 	public SimpleDTMC getRes(){
@@ -68,44 +68,14 @@ public class SimpleGeneratorS implements Callable<String>{
 	public void setRes(SimpleDTMC res){
 		this.res=res;
 	}
-
-	public int[] getVars(){
-		return this.rws;
-	}
-	
-	public void setVars(int[] vars){
-		this.rws=vars;
-	}
 	
 	@Override
 	public String call() throws Exception {
 		long globalInit=System.currentTimeMillis();
 		String ret=this.runID;
-			if(this.rws==null){
-				rws=new int[this.numVars];
-				for(int i=0;i<this.numVars;i++){
-					rws[i]=-1;
-				}
-				int count=0;
-				//TODO: better shuffle
-				while(count<this.numVars){
-					int nextPlace=rand.nextInt(this.numStates-this.numAbsorbing);
-					boolean ok=true;
-					for(int i=0;i<count;i++){
-						if(rws[i]==nextPlace){
-							ok=false;
-							break;
-						}
-					}
-					if(ok){
-						rws[count]=nextPlace;
-						count++;
-					}
-				}
-			}
-			
+		
 			long letSee=System.currentTimeMillis();
-			res.unsimplified(this.runID+"Du",0,from, to, rws);
+			res.unsimplified(this.runID+"Du",0,from, to);
 			long designTime=(System.currentTimeMillis()-letSee)/1000;
 			PrintWriter fOut=new PrintWriter(new FileOutputStream(this.runID+"DT.log"));
 			try{

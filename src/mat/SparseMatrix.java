@@ -1,114 +1,37 @@
-/**
- * 
- */
 package mat;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
-/**
- * @author anfi
- *
- */
-public class SparseMatrix {
-	private String name;
-	private int size;
-	private Set<MatrixEntry> entries;
-	
-	public SparseMatrix(String name, int size){
-		this.name=name;
-		this.size=size;
-		this.entries=new TreeSet<MatrixEntry>();
+public class SparseMatrix<T> implements Cloneable{
+	TreeMap<MatrixIndex, T> data;
+	T defaultValue;
+	public SparseMatrix(){
+		this(null);
 	}
-	
-	public void addEntry(int x,int y,double val){
-		MatrixEntry m = new MatrixEntry(x, y, val);
-		this.entries.add(m);
+	public SparseMatrix(T defaultValue){
+		data = new TreeMap<MatrixIndex, T>();
+		this.defaultValue = defaultValue;
 	}
-	
-	public void addEntry(MatrixEntry m){
-		this.entries.add(m);
+	public TreeMap<MatrixIndex, T> getMap() {
+		return data;
 	}
-	
-	public Set<MatrixEntry> getEntries(){
-		return this.entries;
+	public T getN(int r, int c) {
+		return data.get(new MatrixIndex(r,c));
 	}
-	
-	public String getName(){
-		return this.name+"";
+	public T get(int r,int c) {
+		T v = getN(r,c);
+		return (v==null) ? defaultValue : v;
 	}
-	
-	public double[][] getAsArray(){
-		double[][] ret=new double[this.size][this.size];
-		for(MatrixEntry e : this.entries){
-			if(e.getValue()!=0){
-				ret[e.getX()-1][e.getY()-1]=e.getValue();
-			}
-		}
-		return ret;
+	public void put(int r,int c, T v) {
+		data.put(new MatrixIndex(r,c), v);
 	}
-	
-	public String getMatlab(){
-		String mat=this.name+"=sparse("+this.size+","+this.size+");\n";
-		for(MatrixEntry e : this.entries){
-			if(e.getValue()!=0){
-				mat=mat+this.name+"("+e.getX()+","+e.getY()+")="+e.getValue()+";\n";
-			}
-		}
-		//mat=mat+"diary D"+this.name+"\n";
-		mat=mat+"d"+this.name+"=det("+this.name+")\n";
-		//mat=mat+"diary off\n";
-		return mat;
+	public int size() {
+		return data.size();
 	}
-	
-	public class MatrixEntry implements Comparable{
-		private int x;
-		private int y;
-		private double value;
 
-		public MatrixEntry(int x, int y, double value){
-			this.x=x;
-			this.y=y;
-			this.value=value;
-		}
-		
-		public int getX() {
-			return x;
-		}
-
-		public void setX(int x) {
-			this.x = x;
-		}
-
-		public int getY() {
-			return y;
-		}
-
-		public void setY(int y) {
-			this.y = y;
-		}
-
-		public double getValue() {
-			return value;
-		}
-
-		public void setValue(double value) {
-			this.value = value;
-		}
-
-		public int compareTo(Object arg0) {
-			if(!(arg0 instanceof MatrixEntry)){
-				return -1;
-			}
-			int ax=((MatrixEntry) arg0).getX();
-			int ay=((MatrixEntry) arg0).getY();
-			double avalue=((MatrixEntry) arg0).getValue();
-			if(ax==this.x && ay==this.y && avalue==this.value){
-				return 0;
-			}else{
-				return 1;
-			}
-		}
-		
+	public SparseMatrix<T> clone() {
+		SparseMatrix<T> c = new SparseMatrix<T>(defaultValue);
+		c.data.putAll(data);
+		return c;
 	}
 }
