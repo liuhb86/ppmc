@@ -143,4 +143,8 @@ public class SimpleDTMC implements DTMC {
 		toTransTable(fOut);
 		
 	}
+	
+	public boolean isAbsorbingState(int s) {
+		return s>=this.numTransients;
+	}
 }

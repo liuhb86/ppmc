@@ -5,8 +5,6 @@ import java.util.HashMap;
 import org.lsmp.djep.sjep.PolynomialCreator;
 import org.lsmp.djep.xjep.XJep;
 import org.nfunk.jep.ParseException;
-import org.nfunk.jep.SymbolTable;
-
 import mat.MatrixIndex;
 import mat.SmartMatrix;
 import mat.SparseMatrix;
@@ -14,8 +12,8 @@ import core.SimpleDTMC;
 
 public class SimpleReachabilitySolver {
 	SimpleDTMC model;
-	private SmartMatrix M=null;
-	HashMap <MatrixIndex, String> results = new HashMap <MatrixIndex, String>();
+	SmartMatrix M=null;
+	HashMap <MatrixIndex, String> cofactor = new HashMap <MatrixIndex, String>();
 	XJep jep = new XJep();
 	PolynomialCreator simplifier = new PolynomialCreator(jep);
 	
@@ -46,39 +44,81 @@ public class SimpleReachabilitySolver {
 	}
 	
 	public String solve(int from, int to) {
-		MatrixIndex i = new MatrixIndex(from,to);
-		String r = results.get(i);
-		if (r!=null) return r;
-		r = solveT2A(from, to);
-		results.put(i, r);
-		return r;
+		if (model.isAbsorbingState(from))
+			return this.solveA2S(from, to);
+		if (model.isAbsorbingState(to)) 
+			return this.solveT2A(from, to);
+		return this.solveT2T(from, to);
 	}
 	
+	String solveA2S(int from, int to) {
+		//assert(from>=model.numTransients);
+		return (from==to)?"1":"0";
+	}
+	
+	/**
+	 * Solve the reachability from transient state 'from' to transient state 'to'
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	String solveT2T(int from, int to) {
+		//assert(from<model.numTransients);
+		//assert(to<model.numTransients);
+		String aji = this.getCofactor(to, from);
+		String ajj = this.getCofactor(to, to);
+		return this.simplify("("+aji+")/("+ajj+")");
+	}
+	
+	/**
+	 * Solve the reachability from transient state 'from' to absorbing state 'to'
+	 * @param from
+	 * @param to
+	 * @return
+	 */
 	public String solveT2A(int from, int to) {
-		assert(from<model.numTransients);
-		assert(to>=model.numTransients);
+		//assert(from<model.numTransients);
+		//assert(to>=model.numTransients);
 
 		SmartMatrix sm= this.getM();
 		String deta=sm.determinant();
 
-		String num="0";
+		StringBuffer num = new StringBuffer("0");
 		for(int i=0;i<model.numTransients;i++){	
 			if(model.trans.getNumericEntry(i, to)!=0){
-				char coef=(from+i)%2==0?'+':'-';
-				SmartMatrix mino=sm.minor(i, from);
-				num=num+coef+"("+mino.determinant()+")*"+model.trans.getEntry(i, to, true);
+				String n = this.getCofactor(i, from);
+				if (!n.equals("0")) {
+					char coef=(from+i)%2==0?'+':'-';
+					num.append(coef).append('(').append(n).append(")*")
+						.append(model.trans.getEntry(i, to, true));
+				}
 			}
 		}	
-		String both="("+num+")/("+deta+")";
+		String both="("+num.toString()+")/("+deta+")";
 	
-		String simpl="-1";
-		try {
-			simpl = jep.toString(simplifier.simplify(jep.parse(both)));
-		} catch (ParseException e) {
-			System.out.println(both);
-			e.printStackTrace();
-		}
+		String simpl= simplify(both);
 		return simpl; 
+	}
+	
+	String getCofactor(int i, int j) {
+		MatrixIndex index = new MatrixIndex(i,j);
+		String c = cofactor.get(index);
+		if (c==null) {
+			SmartMatrix mino=this.getM().minor(i, j);
+			c = mino.determinant();
+			cofactor.put(index, c);
+		}
+		return c;
+	}
+	
+	String simplify(String expr){
+		try {
+			return jep.toString(simplifier.simplify(jep.parse(expr)));
+		} catch (ParseException e) {
+			System.out.println(expr);
+			e.printStackTrace();
+			return "-1";
+		}
 	}
 		
 }

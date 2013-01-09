@@ -15,10 +15,9 @@ public class SmartMatrix {
 	public static final int MIN_MATLAB_SIZE=Integer.MAX_VALUE;
 	private double[][] base;
 	private SparseMatrix<String> vars;
-	private String det="";
+	private String det = null;
 	private String prefix="";
 	private String postfix="";
-	private String matlabAssign="";
 	
 	public static double[][] randomSquaredMatrix01(int size){
 		double[][] ret = new double[size][size];
@@ -96,25 +95,8 @@ public class SmartMatrix {
 
 		this.prefix=prefix;
 		this.postfix=postfix;
-		this.matlabAssign="";
 	}
 	
-	public void run(){
-		String temp="";
-		temp = this.determinant();
-		synchronized(this.det){
-			this.det=temp;
-		}
-	}
-	
-	public String getDeterminant(){
-		String temp="";
-		synchronized(this.det){
-			temp=this.det;
-		}
-		return temp;
-	}
-
 	public void setPrefix(String p){
 		synchronized(this.prefix){
 			this.prefix=p;
@@ -159,20 +141,25 @@ public class SmartMatrix {
 	public int getDimC() {
 		return this.base[0].length;
 	}
+	
 	public String determinant() {
+		return determinant(false);
+	}
+	public String determinant(boolean recalc) {
 		//System.out.println("Computing det. Size: "+this.base.length);
+		if (this.det != null && !recalc) return this.det; 
 		int row=this.getSymbolicLine();
 		if(row>=this.base.length){
 			//System.out.println("MANNAGGIALAMORTE");
 		}
 		if(row==-1){
 			if(this.base.length==0){
-				return "1";
+				this.det = "1";
 			}else{
 					//System.out.println("Computing determinant internally");
 					Matrix m=new Matrix(this.base);
 					double det = m.det();
-					return det==0.0?"0":Double.toString(det);
+					this.det = det==0.0?"0":Double.toString(det);
 			}
 		}else{
 			String ret="";
@@ -188,14 +175,11 @@ public class SmartMatrix {
 							ret=ret+coef+this.getEntry(row, i, true)+"*("+mino.determinant()+")";
 					}
 			}
-			return (ret.length()>0)?ret:"0";
+			this.det = (ret.length()>0)?ret:"0";
 		}
+		return this.det;
 	}
 	
-	public String getMatlabAssign(){
-		return ""+this.matlabAssign;
-	}
-
 	public SmartMatrix minor(int r,int c){
 		double[][] par=new double[this.base.length-1][this.base.length-1];
 		SparseMatrix<String> var=new SparseMatrix<String>();
