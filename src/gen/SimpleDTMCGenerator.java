@@ -1,5 +1,8 @@
 package gen;
 
+import java.util.BitSet;
+import java.util.HashMap;
+
 import mat.MatrixIndex;
 import mat.SparseMatrix;
 import util.Random;
@@ -82,7 +85,7 @@ public class SimpleDTMCGenerator {
         for (MatrixIndex i : vars.getMap().keySet()) {
         	process[i.row][i.col] = -1;
         }
-        SimpleDTMC ret=new SimpleDTMC(process,vars, nTransient,0);
+        SimpleDTMC ret=new SimpleDTMC(process,vars, nTransient,0, new HashMap<String, BitSet>());
         return ret;
 	}
 }

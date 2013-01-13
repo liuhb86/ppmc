@@ -1,23 +1,79 @@
-/**
- * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
- */options{  static = true;}PARSER_BEGIN(Prop)package prop.parser;
+options{  STATIC = true;
+  UNICODE_INPUT = true;}PARSER_BEGIN(PropParser)package prop.parser;
 
-public class Prop{  public static void main(String args []) throws ParseException  {    EG1 parser = new EG1(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (EG1.one_line())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        EG1.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(EG1)TOKEN :{  < SPACE : [" ", "\r", "\t", "\n"]+ >
+import java.io.StringReader;
+
+import prop.*;
+
+public class PropParser{
+
+  public static StateProp parse(String s) throws ParseException  {
+    PropParser.ReInit(new StringReader(s));
+    return PropParser.start();  }}PARSER_END(PropParser)TOKEN :{  < #SPACE : [" ", "\r", "\t", "\n"] >
+| < DELIM : (<SPACE >)+ >
 }
 TOKEN :
 {
   < NOT : "!" >
-| < AND : "/\" | "&&" >
-| < OR : "\/" | "||" >
+| < AND : "/\\" | "&&" >
+| < OR : "\\/" | "||" >
 | < TRUE : "true" >
 | < FALSE : "false" >
 | < PROB : "P" >
-}TOKEN : {  < NEXT : "X" >| < EVENTUALLY : "<>" >| < ALWAYS : "[]" >| < UNTIL : "U" >}TOKEN :{  < COMP : ["<=", "<", ">=", ">"] >
-| <LBRACKET : "(" >
-| <RBRACKET : ")" >
-| < LT : "<" >
+}TOKEN : {  < NEXT : "X" >| < EVENTUALLY : "<>" >| < ALWAYS : "[]" >| < UNTIL : "U" >}TOKEN :{  < COMP : "<=" | "<" | ">=" |">" >
 | <DIGIT : ["0" - "9"] >
-| <INTEGER : <DIGIT>+ >
-| <FLOAT : <DIGIT>+.<DIGIT>+>}
+| <INTEGER : (<DIGIT>)+ >
+| <FLOAT : (<DIGIT>)+ "." (<DIGIT>)+>
+| <IDENT : ["A" - "Z", "a" -"z", "_"](["A" - "Z", "a" -"z" ,"0"-"9", "_"])* >}
 
-int one_line() :{}{  sum() ";"  {    return 0;  }| ";"  {    return 1;  }}void sum() :{}{  term()  (    (      < PLUS >    | < MINUS >    )    term()  )*}void term() :{}{  unary()  (    (      < MULTIPLY >    | < DIVIDE >    )    unary()  )*}void unary() :{}{  < MINUS > element()| element()}void element() :{}{  < CONSTANT >| "(" sum() ")"}
+StateProp start() :{  StateProp p;
+}{
+  [<DELIM >]
+  p = stateFormula()
+  [<DELIM >]
+  {    return p;  }}
+
+StateProp stateFormula() :
+{
+  StateProp p1,p2;
+}
+{
+  p1 = stateTerm()
+  (      LOOKAHEAD(2)	  [< DELIM >] < OR > [< DELIM >]
+	  p2 = stateTerm()
+	  {
+	    p1 = new PropOr(p1,p2);
+	  }
+  )*
+  {    return p1;
+  }
+}
+StateProp stateTerm() :
+{
+  StateProp p1,p2;}
+{
+  p1 = stateElement()  (    LOOKAHEAD(2)    [< DELIM >] < AND > [< DELIM >]
+    p2 = stateElement()
+  {    p1 = new PropAnd(p1,p2);
+  }
+  )*
+  {    return p1;
+  }}
+StateProp stateElement() :
+{
+  StateProp p;
+  Token t;
+}
+{ 
+  "(" [< DELIM >]
+  p = stateFormula()
+  [< DELIM >] ")"
+  { return p; }
+| < TRUE >
+  {
+    return new PropTrue();
+  }
+| t = < IDENT >
+  {
+	return new PropAtom(t.image);
+  }  }

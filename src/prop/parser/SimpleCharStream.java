@@ -281,7 +281,7 @@ public class SimpleCharStream
   }
 
   /** Reinitialise. */
-  public void ReInit(java.io.Reader dstream, int startline,
+  static public void ReInit(java.io.Reader dstream, int startline,
   int startcolumn, int buffersize)
   {
     inputStream = dstream;
@@ -301,14 +301,14 @@ public class SimpleCharStream
   }
 
   /** Reinitialise. */
-  public void ReInit(java.io.Reader dstream, int startline,
+  static public void ReInit(java.io.Reader dstream, int startline,
                      int startcolumn)
   {
     ReInit(dstream, startline, startcolumn, 4096);
   }
 
   /** Reinitialise. */
-  public void ReInit(java.io.Reader dstream)
+  static public void ReInit(java.io.Reader dstream)
   {
     ReInit(dstream, 1, 1, 4096);
   }
@@ -353,38 +353,38 @@ public class SimpleCharStream
   }
 
   /** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, String encoding, int startline,
+  static public void ReInit(java.io.InputStream dstream, String encoding, int startline,
                           int startcolumn, int buffersize) throws java.io.UnsupportedEncodingException
   {
     ReInit(encoding == null ? new java.io.InputStreamReader(dstream) : new java.io.InputStreamReader(dstream, encoding), startline, startcolumn, buffersize);
   }
 
   /** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, int startline,
+  static public void ReInit(java.io.InputStream dstream, int startline,
                           int startcolumn, int buffersize)
   {
     ReInit(new java.io.InputStreamReader(dstream), startline, startcolumn, buffersize);
   }
 
   /** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException
+  static public void ReInit(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException
   {
     ReInit(dstream, encoding, 1, 1, 4096);
   }
 
   /** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream)
+  static public void ReInit(java.io.InputStream dstream)
   {
     ReInit(dstream, 1, 1, 4096);
   }
   /** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, String encoding, int startline,
+  static public void ReInit(java.io.InputStream dstream, String encoding, int startline,
                      int startcolumn) throws java.io.UnsupportedEncodingException
   {
     ReInit(dstream, encoding, startline, startcolumn, 4096);
   }
   /** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, int startline,
+  static public void ReInit(java.io.InputStream dstream, int startline,
                      int startcolumn)
   {
     ReInit(dstream, startline, startcolumn, 4096);
@@ -472,4 +472,4 @@ public class SimpleCharStream
   }
 
 }
-/* JavaCC - OriginalChecksum=2e9309e6f9a0a7df88675a84b30329b2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=6a5dce4bfbbdf78849cfd1fddb1ae7c5 (do not edit this line) */
