@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ppmc
+Bundle-SymbolicName: org.net9.simplex.ppmc
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: ppmc.jar,
+ lib/Jama-1.0.2.jar,
+ lib/jep-2.4.1.jar,
+ lib/ext-1.1.1.jar
+Export-Package: 
+ org.net9.simplex.ppmc.core,
+ org.net9.simplex.ppmc.gen,
+ org.net9.simplex.ppmc.mat,
+ org.net9.simplex.ppmc.prop,
+ org.net9.simplex.ppmc.prop.parser,
+ org.net9.simplex.ppmc.solver,
+ org.net9.simplex.ppmc.test,
+ org.net9.simplex.ppmc.util
+Bundle-Vendor: Hongbo Liu
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
