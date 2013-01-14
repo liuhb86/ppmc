@@ -1,4 +1,4 @@
-package org.net9.simplex.ppmc.solver;
+package org.net9.simplex.ppmc.checker;
 
 import java.util.HashMap;
 
@@ -10,14 +10,14 @@ import org.net9.simplex.ppmc.mat.SmartMatrix;
 import org.net9.simplex.ppmc.mat.SparseMatrix;
 import org.nfunk.jep.ParseException;
 
-public class SimpleReachabilitySolver {
+public class SimpleReachabilityChecker {
 	SimpleDTMC model;
 	SmartMatrix M=null;
 	HashMap <MatrixIndex, String> cofactor = new HashMap <MatrixIndex, String>();
 	XJep jep = new XJep();
 	PolynomialCreator simplifier = new PolynomialCreator(jep);
 	
-	public SimpleReachabilitySolver(SimpleDTMC model) {
+	public SimpleReachabilityChecker(SimpleDTMC model) {
 		this.model = model;
 		jep.setAllowUndeclared(true);
 	}
@@ -43,26 +43,26 @@ public class SimpleReachabilitySolver {
 		return this.M;
 	}
 	
-	public String solve(int from, int to) {
+	public String check(int from, int to) {
 		if (model.isAbsorbingState(from))
-			return this.solveA2S(from, to);
+			return this.checkA2S(from, to);
 		if (model.isAbsorbingState(to)) 
-			return this.solveT2A(from, to);
-		return this.solveT2T(from, to);
+			return this.checkT2A(from, to);
+		return this.checkT2T(from, to);
 	}
 	
-	String solveA2S(int from, int to) {
+	String checkA2S(int from, int to) {
 		//assert(from>=model.numTransients);
 		return (from==to)?"1":"0";
 	}
 	
 	/**
-	 * Solve the reachability from transient state 'from' to transient state 'to'
+	 * Check the reachability from transient state 'from' to transient state 'to'
 	 * @param from
 	 * @param to
 	 * @return
 	 */
-	String solveT2T(int from, int to) {
+	String checkT2T(int from, int to) {
 		//assert(from<model.numTransients);
 		//assert(to<model.numTransients);
 		String aji = this.getCofactor(to, from);
@@ -71,12 +71,12 @@ public class SimpleReachabilitySolver {
 	}
 	
 	/**
-	 * Solve the reachability from transient state 'from' to absorbing state 'to'
+	 * Check the reachability from transient state 'from' to absorbing state 'to'
 	 * @param from
 	 * @param to
 	 * @return
 	 */
-	public String solveT2A(int from, int to) {
+	public String checkT2A(int from, int to) {
 		//assert(from<model.numTransients);
 		//assert(to>=model.numTransients);
 

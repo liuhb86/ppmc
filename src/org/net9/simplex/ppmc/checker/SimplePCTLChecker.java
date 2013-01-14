@@ -1,26 +1,26 @@
-package org.net9.simplex.ppmc.solver;
+package org.net9.simplex.ppmc.checker;
 
 import java.util.Stack;
 
 import org.net9.simplex.ppmc.core.SimpleDTMC;
 import org.net9.simplex.ppmc.prop.*;
-import org.net9.simplex.ppmc.runtime.RuntimeChecker;
-import org.net9.simplex.ppmc.runtime.logic.*;
+import org.net9.simplex.ppmc.solver.Solver;
+import org.net9.simplex.ppmc.solver.logic.*;
 
-public class SimplePCTLSolver implements StatePropVisitor {
+public class SimplePCTLChecker implements StatePropVisitor {
 	SimpleDTMC model;
-	Stack<RuntimeChecker> stack;
+	Stack<Solver> stack;
 	
-	final RuntimeChecker sTrue, sFalse;
+	final Solver sTrue, sFalse;
 	
-	public SimplePCTLSolver (SimpleDTMC model) {
+	public SimplePCTLChecker (SimpleDTMC model) {
 		this.model = model;
-		this.sTrue = new TrueChecker(model.size());
-		this.sFalse = new FalseChecker(model.size());
+		this.sTrue = new TrueSolver(model.size());
+		this.sFalse = new FalseSolver(model.size());
 	}
 	
-	public RuntimeChecker solve(StateProp p){
-		stack = new Stack<RuntimeChecker>();
+	public Solver check(StateProp p){
+		stack = new Stack<Solver>();
 		p.tranverse((StatePropVisitor)this);
 		return stack.pop();
 	}
@@ -30,7 +30,7 @@ public class SimplePCTLSolver implements StatePropVisitor {
 
 	@Override
 	public void visit(PropTrue p) {
-		stack.push(new TrueChecker(model.size()));
+		stack.push(new TrueSolver(model.size()));
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class SimplePCTLSolver implements StatePropVisitor {
 		
 	}
 	
-	RuntimeChecker getConstChecker(boolean b) {
+	Solver getConstChecker(boolean b) {
 		return b? sTrue: sFalse;
 	}
 	

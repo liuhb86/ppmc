@@ -8,8 +8,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 
+import org.net9.simplex.ppmc.checker.SimpleReachabilityChecker;
 import org.net9.simplex.ppmc.core.SimpleDTMC;
-import org.net9.simplex.ppmc.solver.SimpleReachabilitySolver;
 import org.net9.simplex.ppmc.util.Random;
 import org.net9.simplex.ppmc.util.Stdio;
 
@@ -67,8 +67,8 @@ public class SimpleGeneratorS implements Callable<String>{
 		String ret=this.runID;
 		
 			long letSee=System.currentTimeMillis();
-			SimpleReachabilitySolver solver = new SimpleReachabilitySolver(res);
-			String result = solver.solve(from, to);
+			SimpleReachabilityChecker solver = new SimpleReachabilityChecker(res);
+			String result = solver.check(from, to);
 			System.out.println(result);
 			long designTime=(System.currentTimeMillis()-letSee)/1000;
 			PrintWriter fOut=new PrintWriter(new FileOutputStream(this.runID+"DT.log"));

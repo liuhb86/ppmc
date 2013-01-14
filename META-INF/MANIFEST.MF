@@ -8,12 +8,12 @@ Bundle-ClassPath: ppmc.jar,
  lib/jep-2.4.1.jar,
  lib/ext-1.1.1.jar
 Export-Package: 
+ org.net9.simplex.ppmc.checker,
  org.net9.simplex.ppmc.core,
  org.net9.simplex.ppmc.gen,
  org.net9.simplex.ppmc.mat,
  org.net9.simplex.ppmc.prop,
  org.net9.simplex.ppmc.prop.parser,
- org.net9.simplex.ppmc.solver,
  org.net9.simplex.ppmc.test,
  org.net9.simplex.ppmc.util
 Bundle-Vendor: Hongbo Liu
