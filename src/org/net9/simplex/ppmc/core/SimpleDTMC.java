@@ -236,4 +236,8 @@ public class SimpleDTMC implements DTMC {
 	public boolean isAbsorbingState(int s) {
 		return s>=this.numTransients;
 	}
+	
+	public int size() {
+		return trans.getDim();
+	}
 }
