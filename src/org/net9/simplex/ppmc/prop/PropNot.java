@@ -10,4 +10,8 @@ public class PropNot extends StateProperty {
 		p1.print();
 		System.out.println("}");
 	}
+	@Override
+	public void accept(StatePropertyVisitor visitor) {
+		visitor.visit(this);
+	}
 }

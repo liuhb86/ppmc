@@ -30,9 +30,6 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 	}
 
 	@Override
-	public void visit(StateProperty p) {assert(false);}
-
-	@Override
 	public void visit(PropTrue p) {
 		this.result = sTrue;
 	}

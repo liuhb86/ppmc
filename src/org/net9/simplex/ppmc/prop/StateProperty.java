@@ -5,7 +5,5 @@ public abstract class StateProperty {
 	public void print(){
 		System.out.println(this.getClass().toString());
 	}
-	public void accept(StatePropertyVisitor visitor){
-		visitor.visit(this);
-	}
+	public abstract void accept(StatePropertyVisitor visitor);
 }

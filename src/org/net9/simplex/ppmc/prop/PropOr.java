@@ -17,4 +17,8 @@ public class PropOr extends StateProperty {
 		}
 		System.out.println("}");
 	}
+	@Override
+	public void accept(StatePropertyVisitor visitor) {
+		visitor.visit(this);
+	}
 }

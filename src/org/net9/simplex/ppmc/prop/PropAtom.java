@@ -6,4 +6,8 @@ public class PropAtom extends StateProperty {
 	public void print(){
 		System.out.println("Atom: "+atom);
 	}
+	@Override
+	public void accept(StatePropertyVisitor visitor) {
+		visitor.visit(this);
+	}
 }
