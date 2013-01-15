@@ -1,17 +1,19 @@
 package org.net9.simplex.ppmc.prop;
 
+import java.util.LinkedList;
+
 public class PropAnd extends StateProp {
-	public StateProp p1;
-	public StateProp p2;
-	public PropAnd (StateProp p1, StateProp p2) {
-		this.p1 = p1;
-		this.p2 = p2;
+	public LinkedList<StateProp> item =  new LinkedList<StateProp>();
+	public PropAnd (StateProp p1, StateProp p2) { 
+		item.add(p1);
+		item.add(p2);
 	}
 	public void print(){
 		System.out.println("AND{");
-		p1.print();
-		System.out.println(",");
-		p2.print();
+		for (StateProp p :item){
+			p.print();
+			System.out.println(",");
+		}
 		System.out.println("}");
 	}
 }

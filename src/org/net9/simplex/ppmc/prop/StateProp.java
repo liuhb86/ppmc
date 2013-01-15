@@ -5,7 +5,7 @@ public abstract class StateProp {
 	public void print(){
 		System.out.println(this.getClass().toString());
 	}
-	public void tranverse(StatePropVisitor visitor){
+	public void accept(StatePropVisitor visitor){
 		visitor.visit(this);
 	}
 }

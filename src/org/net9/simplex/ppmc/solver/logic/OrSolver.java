@@ -6,30 +6,29 @@ import java.util.LinkedList;
 
 import org.net9.simplex.ppmc.solver.Solver;
 
-public class AndSolver implements Solver {
-
+public class OrSolver implements Solver{
 	public LinkedList<Solver> item = new LinkedList<Solver>();
 	
-	public AndSolver(Solver s1, Solver s2) {
+	public OrSolver(Solver s1, Solver s2) {
 		item.add(s1);
 		item.add(s2);
 	}
-	public AndSolver() {
+	public OrSolver() {
 	}
 	
 	@Override
 	public boolean solve(HashMap<String, Double> val) {
 		for (Solver s:item){
-			if (!s.solve(val)) return false;
+			if (s.solve(val)) return true;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
 	public BitSet solveSet(HashMap<String, Double> val) {
 		BitSet bs = new BitSet();
 		for (Solver s:item)
-		bs.and(s.solveSet(val));
+		bs.or(s.solveSet(val));
 		return bs;
 	}
 }
