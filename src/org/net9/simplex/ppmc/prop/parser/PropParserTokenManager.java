@@ -79,6 +79,8 @@ static private int jjMoveStringLiteralDfa0_0()
          return jjStopAtPos(0, 18);
       case 41:
          return jjStopAtPos(0, 19);
+      case 44:
+         return jjStopAtPos(0, 21);
       case 60:
          return jjMoveStringLiteralDfa1_0(0x400L);
       case 80:
@@ -93,6 +95,10 @@ static private int jjMoveStringLiteralDfa0_0()
          return jjMoveStringLiteralDfa1_0(0x80L);
       case 116:
          return jjMoveStringLiteralDfa1_0(0x40L);
+      case 123:
+         return jjStopAtPos(0, 20);
+      case 125:
+         return jjStopAtPos(0, 22);
       default :
          return jjMoveNfa_0(2, 0);
    }
@@ -395,7 +401,7 @@ static final int[] jjnextStates = {
 public static final String[] jjstrLiteralImages = {
 "", null, null, "\41", null, null, "\164\162\165\145", "\146\141\154\163\145", 
 "\120", "\130", "\74\76", "\133\135", "\125", null, null, null, null, null, "\50", 
-"\51", };
+"\51", "\173", "\54", "\175", };
 
 /** Lexer state names. */
 public static final String[] lexStateNames = {

@@ -38,6 +38,7 @@ public class PropParser implements PropParserConstants {
 
   static final public StateProp stateFormula() throws ParseException {
   StateProp p1,p2;
+  PropOr p = null;
     p1 = stateTerm();
     label_1:
     while (true) {
@@ -64,7 +65,13 @@ public class PropParser implements PropParserConstants {
         ;
       }
       p2 = stateTerm();
-            p1 = new PropOr(p1,p2);
+            if (p==null) {
+                p = new PropOr(p1,p2);
+                p1 = p;
+            }
+            else {
+                p.item.add(p2);
+            }
     }
     {if (true) return p1;}
     throw new Error("Missing return statement in function");
@@ -72,6 +79,7 @@ public class PropParser implements PropParserConstants {
 
   static final public StateProp stateTerm() throws ParseException {
   StateProp p1,p2;
+  PropAnd p = null;
     p1 = stateElement();
     label_2:
     while (true) {
@@ -98,7 +106,12 @@ public class PropParser implements PropParserConstants {
         ;
       }
       p2 = stateElement();
-    p1 = new PropAnd(p1,p2);
+        if (p==null) {
+                p = new PropAnd(p1,p2);
+                p1 = p;
+        } else {
+                p.item.add(p2);
+        }
     }
     {if (true) return p1;}
     throw new Error("Missing return statement in function");
@@ -138,8 +151,54 @@ public class PropParser implements PropParserConstants {
       t = jj_consume_token(IDENT);
         {if (true) return new PropAtom(t.image);}
       break;
+    case 20:
+      jj_consume_token(20);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+        ;
+      }
+      t = jj_consume_token(INTEGER);
+    PropSet ps = new PropSet();
+    ps.item.add(Integer.parseInt(t.image));
+      label_3:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DELIM:
+        case 21:
+          ;
+          break;
+        default:
+          jj_la1[9] = jj_gen;
+          break label_3;
+        }
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DELIM:
+          jj_consume_token(DELIM);
+          break;
+        default:
+          jj_la1[10] = jj_gen;
+          ;
+        }
+        jj_consume_token(21);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DELIM:
+          jj_consume_token(DELIM);
+          break;
+        default:
+          jj_la1[11] = jj_gen;
+          ;
+        }
+        t = jj_consume_token(INTEGER);
+    ps.item.add(Integer.parseInt(t.image));
+      }
+      jj_consume_token(22);
+      break;
     default:
-      jj_la1[8] = jj_gen;
+      jj_la1[12] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -160,8 +219,8 @@ public class PropParser implements PropParserConstants {
     finally { jj_save(1, xla); }
   }
 
-  static private boolean jj_3R_3() {
-    if (jj_3R_4()) return true;
+  static private boolean jj_3R_9() {
+    if (jj_scan_token(20)) return true;
     return false;
   }
 
@@ -172,30 +231,43 @@ public class PropParser implements PropParserConstants {
     if (jj_scan_token(OR)) return true;
     xsp = jj_scanpos;
     if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_3()) return true;
+    if (jj_3R_4()) return true;
     return false;
   }
 
-  static private boolean jj_3R_5() {
+  static private boolean jj_3R_6() {
     if (jj_scan_token(18)) return true;
     return false;
   }
 
-  static private boolean jj_3R_4() {
+  static private boolean jj_3R_5() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_5()) {
-    jj_scanpos = xsp;
     if (jj_3R_6()) {
     jj_scanpos = xsp;
-    if (jj_3R_7()) return true;
+    if (jj_3R_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_8()) {
+    jj_scanpos = xsp;
+    if (jj_3R_9()) return true;
+    }
     }
     }
     return false;
   }
 
-  static private boolean jj_3R_7() {
+  static private boolean jj_3R_4() {
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_8() {
     if (jj_scan_token(IDENT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_7() {
+    if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
@@ -206,12 +278,7 @@ public class PropParser implements PropParserConstants {
     if (jj_scan_token(AND)) return true;
     xsp = jj_scanpos;
     if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_4()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_6() {
-    if (jj_scan_token(TRUE)) return true;
+    if (jj_3R_5()) return true;
     return false;
   }
 
@@ -227,13 +294,13 @@ public class PropParser implements PropParserConstants {
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[9];
+  static final private int[] jj_la1 = new int[13];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x60040,};
+      jj_la1_0 = new int[] {0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x200004,0x4,0x4,0x160040,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[2];
   static private boolean jj_rescan = false;
@@ -257,7 +324,7 @@ public class PropParser implements PropParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -272,7 +339,7 @@ public class PropParser implements PropParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -290,7 +357,7 @@ public class PropParser implements PropParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -301,7 +368,7 @@ public class PropParser implements PropParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -318,7 +385,7 @@ public class PropParser implements PropParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -328,7 +395,7 @@ public class PropParser implements PropParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 13; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -440,12 +507,12 @@ public class PropParser implements PropParserConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[20];
+    boolean[] la1tokens = new boolean[23];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 13; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -454,7 +521,7 @@ public class PropParser implements PropParserConstants {
         }
       }
     }
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 23; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

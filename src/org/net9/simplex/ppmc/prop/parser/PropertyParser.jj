@@ -1,9 +1,9 @@
 options{  STATIC = true;
-  UNICODE_INPUT = true;}PARSER_BEGIN(PropParser)package prop.parser;
+  UNICODE_INPUT = true;}PARSER_BEGIN(PropParser)package org.net9.simplex.ppmc.prop.parser;
 
 import java.io.StringReader;
 
-import prop.*;
+import org.net9.simplex.ppmc.prop.*;
 
 public class PropParser{
 
@@ -52,7 +52,7 @@ StateProp stateTerm() :
 {
   StateProp p1,p2;  PropAnd p = null;}
 {
-  p1 = stateElemen t()  (    LOOKAHEAD(2)    [< DELIM >] < AND > [< DELIM >]
+  p1 = stateElement()  (    LOOKAHEAD(2)    [< DELIM >] < AND > [< DELIM >]
     p2 = stateElement()
   {  	if (p==null) {  		p = new PropAnd(p1,p2);  		p1 = p;  	} else {  		p.item.add(p2);  	}
   }
@@ -76,4 +76,4 @@ StateProp stateElement() :
 | t = < IDENT >
   {
 	return new PropAtom(t.image);
-  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image);  }  ( [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image);  }  )* "}"}
+  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  ( [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* "}"}

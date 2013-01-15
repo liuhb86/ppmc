@@ -70,6 +70,9 @@ public interface PropParserConstants {
     "<IDENT>",
     "\"(\"",
     "\")\"",
+    "\"{\"",
+    "\",\"",
+    "\"}\"",
   };
 
 }
