@@ -1,15 +1,14 @@
-options{  STATIC = true;
-  UNICODE_INPUT = true;}PARSER_BEGIN(PropParser)package org.net9.simplex.ppmc.prop.parser;
-
+options{  STATIC = false;  SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+  UNICODE_INPUT = true;}PARSER_BEGIN(Parser)package org.net9.simplex.ppmc.prop.parser.javacc;
+import java.io.Reader;
 import java.io.StringReader;
-
+import org.net9.simplex.ppmc.util.JavaCCParseException;
 import org.net9.simplex.ppmc.prop.*;
-
-public class PropParser{
-
-  public static StateProp parse(String s) throws ParseException  {
-    PropParser.ReInit(new StringReader(s));
-    return PropParser.start();  }}PARSER_END(PropParser)TOKEN :{  < #SPACE : [" ", "\r", "\t", "\n"] >
+@SuppressWarnings("all")
+public class Parser{
+  public Parser ()  {  }
+  public StateProp parse(String s) throws java.text.ParseException  {
+    this.ReInit(new StringReader(s));    try {      StateProp p = this.start();      return p;    } catch (ParseException e) {      throw new JavaCCParseException(e);    } catch (TokenMgrError e) {      throw new JavaCCParseException(e);    } finally    {      this.ReInit((Reader)null);    }  }}PARSER_END(Parser)TOKEN :{  < #SPACE : [" ", "\r", "\t", "\n"] >
 | < DELIM : (<SPACE >)+ >
 }
 TOKEN :

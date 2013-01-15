@@ -2,7 +2,7 @@ package org.net9.simplex.ppmc.prop;
 
 import java.util.HashSet;
 
-public class PropSet extends PathProp {
+public class PropSet extends PathProperty {
 	public HashSet<Integer> item;
 	public PropSet(){
 		

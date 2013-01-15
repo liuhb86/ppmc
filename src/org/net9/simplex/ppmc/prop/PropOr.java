@@ -2,16 +2,16 @@ package org.net9.simplex.ppmc.prop;
 
 import java.util.LinkedList;
 
-public class PropOr extends StateProp {
-	public LinkedList<StateProp> item =  new LinkedList<StateProp>();
+public class PropOr extends StateProperty {
+	public LinkedList<StateProperty> item =  new LinkedList<StateProperty>();
 
-	public PropOr (StateProp p1, StateProp p2) {
+	public PropOr (StateProperty p1, StateProperty p2) {
 		item.add(p1);
 		item.add(p2);
 	}
 	public void print(){
 		System.out.println("OR{");
-		for (StateProp p :item){
+		for (StateProperty p :item){
 			p.print();
 			System.out.println(",");
 		}

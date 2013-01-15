@@ -1,8 +1,8 @@
 package org.net9.simplex.ppmc.prop;
 
-public class PropNot extends StateProp {
-	public StateProp p1;
-	public PropNot (StateProp p1) {
+public class PropNot extends StateProperty {
+	public StateProperty p1;
+	public PropNot (StateProperty p1) {
 		this.p1 = p1;
 	}
 	public void print(){

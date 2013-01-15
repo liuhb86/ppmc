@@ -1,11 +1,11 @@
 package org.net9.simplex.ppmc.prop;
 
-public abstract class StateProp {
+public abstract class StateProperty {
 	public boolean isNested = false;
 	public void print(){
 		System.out.println(this.getClass().toString());
 	}
-	public void accept(StatePropVisitor visitor){
+	public void accept(StatePropertyVisitor visitor){
 		visitor.visit(this);
 	}
 }

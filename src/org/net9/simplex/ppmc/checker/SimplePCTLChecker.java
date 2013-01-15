@@ -6,7 +6,7 @@ import org.net9.simplex.ppmc.prop.*;
 import org.net9.simplex.ppmc.solver.Solver;
 import org.net9.simplex.ppmc.solver.logic.*;
 
-public class SimplePCTLChecker implements StatePropVisitor {
+public class SimplePCTLChecker implements StatePropertyVisitor {
 	SimpleDTMC model;
 	
 	final Solver sTrue, sFalse;
@@ -22,15 +22,15 @@ public class SimplePCTLChecker implements StatePropVisitor {
 		this.sFalse = new FalseSolver(model.size());
 	}
 	
-	public Solver check(StateProp p){
+	public Solver check(StateProperty p){
 		initState = model.currentState;
 		isNested = false;
-		p.accept((StatePropVisitor)this);
+		p.accept((StatePropertyVisitor)this);
 		return this.result;
 	}
 
 	@Override
-	public void visit(StateProp p) {assert(false);}
+	public void visit(StateProperty p) {assert(false);}
 
 	@Override
 	public void visit(PropTrue p) {
@@ -65,7 +65,7 @@ public class SimplePCTLChecker implements StatePropVisitor {
 	public void visit(PropAnd p) {
 		AndSolver sc = new AndSolver();
 		AndSolver ss = new AndSolver();
-		for (StateProp sp: p.item){
+		for (StateProperty sp: p.item){
 			this.check(sp);
 			Solver s = this.result;
 			if (s==sFalse) {
@@ -100,7 +100,7 @@ public class SimplePCTLChecker implements StatePropVisitor {
 	public void visit(PropOr p) {
 		OrSolver sc = new OrSolver();
 		OrSolver ss = new OrSolver();
-		for (StateProp sp: p.item){
+		for (StateProperty sp: p.item){
 			this.check(sp);
 			Solver s = this.result;
 			if (s==sTrue) {
