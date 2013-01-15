@@ -6,9 +6,9 @@ import java.io.StringReader;
 import org.net9.simplex.ppmc.prop.*;
 @SuppressWarnings("all")
 public class Parser{
-  public Parser ()  {  }
-  public StateProp parse(String s) throws java.text.ParseException  {
-    this.ReInit(new StringReader(s));    try {      StateProp p = this.start();      return p;    } catch (ParseException e) {      throw new JavaCCParseException(e);    } catch (TokenMgrError e) {      throw new JavaCCParseException(e);    } finally    {      this.ReInit((Reader)null);    }  }}PARSER_END(Parser)TOKEN :{  < #SPACE : [" ", "\r", "\t", "\n"] >
+  public Parser ()  {    this((Reader)null);  }
+  public StateProperty parse(String s) throws java.text.ParseException  {
+    this.ReInit(new StringReader(s));    try {      StateProperty p = this.start();      return p;    } catch (ParseException e) {      throw new JavaCCParseException(e);    } catch (TokenMgrError e) {      throw new JavaCCParseException(e);    } finally    {      this.ReInit((Reader)null);    }  }}PARSER_END(Parser)TOKEN :{  < #SPACE : [" ", "\r", "\t", "\n"] >
 | < DELIM : (<SPACE >)+ >
 }
 TOKEN :
@@ -25,16 +25,16 @@ TOKEN :
 | <FLOAT : (<DIGIT>)+ "." (<DIGIT>)+>
 | <IDENT : ["A" - "Z", "a" -"z", "_"](["A" - "Z", "a" -"z" ,"0"-"9", "_"])* >}
 
-StateProp start() :{  StateProp p;
+StateProperty start() :{  StateProperty p;
 }{
   [<DELIM >]
   p = stateFormula()
   [<DELIM >]
   {    return p;  }}
 
-StateProp stateFormula() :
+StateProperty stateFormula() :
 {
-  StateProp p1,p2;  PropOr p = null;
+  StateProperty p1,p2;  PropOr p = null;
 }
 {
   p1 = stateTerm()
@@ -47,9 +47,9 @@ StateProp stateFormula() :
   {    return p1;
   }
 }
-StateProp stateTerm() :
+StateProperty stateTerm() :
 {
-  StateProp p1,p2;  PropAnd p = null;}
+  StateProperty p1,p2;  PropAnd p = null;}
 {
   p1 = stateElement()  (    LOOKAHEAD(2)    [< DELIM >] < AND > [< DELIM >]
     p2 = stateElement()
@@ -58,9 +58,9 @@ StateProp stateTerm() :
   )*
   {    return p1;
   }}
-StateProp stateElement() :
+StateProperty stateElement() :
 {
-  StateProp p;
+  StateProperty p;
   Token t;
 }
 { 

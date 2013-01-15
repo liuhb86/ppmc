@@ -7,7 +7,7 @@ import java.text.ParseException;
 import org.net9.simplex.ppmc.core.SimpleDTMC;
 import org.net9.simplex.ppmc.util.Stdio;
 
-public class ModelSerial {
+public class ModelSerialization {
 	public static void main(String[] args) {
 		FileReader fr;
 		SimpleDTMC model;

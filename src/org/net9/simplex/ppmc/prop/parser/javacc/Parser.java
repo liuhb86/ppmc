@@ -12,6 +12,7 @@ public class Parser implements ParserConstants {
 
   public Parser ()
   {
+    this((Reader)null);
   }
   public StateProperty parse(String s) throws java.text.ParseException
   {
