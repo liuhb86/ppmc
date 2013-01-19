@@ -6,4 +6,5 @@ public interface StatePropertyVisitor {
 	void visit(PropNot p);
 	void visit(PropAnd p);
 	void visit(PropOr p);
+	void visit(PropSet propSet);
 }

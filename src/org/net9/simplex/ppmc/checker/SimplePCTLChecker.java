@@ -128,6 +128,16 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 		}		
 	}
 	
+	@Override
+	public void visit(PropSet p) {
+		// TODO Auto-generated method stub
+		if (isNested){
+			this.result = new SetSolver(p.item, model.size());
+		} else {
+			this.result = this.getConstSolver(p.item.contains(model.currentState));
+		}
+	}
+	
 	Solver getConstSolver(boolean b) {
 		return b? sTrue: sFalse;
 	}
@@ -137,6 +147,5 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 		if (bs.cardinality()== model.size()) return sTrue;
 		else if (bs.cardinality()== 0) return sFalse;
 		return new SetSolver(bs);
-	}
-	
+	}	
 }

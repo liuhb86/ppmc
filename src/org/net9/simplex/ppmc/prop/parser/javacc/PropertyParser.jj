@@ -20,7 +20,7 @@ TOKEN :
 | < FALSE : "false" >
 | < PROB : "P" >
 }TOKEN : {  < NEXT : "X" >| < EVENTUALLY : "<>" >| < ALWAYS : "[]" >| < UNTIL : "U" >}TOKEN :{  < COMP : "<=" | "<" | ">=" |">" >
-| <DIGIT : ["0" - "9"] >
+| <#DIGIT : ["0" - "9"] >
 | <INTEGER : (<DIGIT>)+ >
 | <FLOAT : (<DIGIT>)+ "." (<DIGIT>)+>
 | <IDENT : ["A" - "Z", "a" -"z", "_"](["A" - "Z", "a" -"z" ,"0"-"9", "_"])* >}
@@ -75,4 +75,4 @@ StateProperty stateElement() :
 | t = < IDENT >
   {
 	return new PropAtom(t.image);
-  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  ( [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* "}"}
+  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  (  LOOKAHEAD(2)  [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* [<DELIM >] "}"  {    return ps;  }}

@@ -2,7 +2,6 @@
 package org.net9.simplex.ppmc.prop.parser.javacc;
 import java.io.Reader;
 import java.io.StringReader;
-import org.net9.simplex.ppmc.util.JavaCCParseException;
 import org.net9.simplex.ppmc.prop.*;
 
 /** Token Manager. */
@@ -222,8 +221,8 @@ private int jjMoveNfa_0(int startState, int curPos)
                case 2:
                   if ((0x3ff000000000000L & l) != 0L)
                   {
-                     if (kind > 14)
-                        kind = 14;
+                     if (kind > 15)
+                        kind = 15;
                      jjCheckNAddStates(0, 2);
                   }
                   else if ((0x100002600L & l) != 0L)
@@ -290,8 +289,8 @@ private int jjMoveNfa_0(int startState, int curPos)
                case 15:
                   if ((0x3ff000000000000L & l) == 0L)
                      break;
-                  if (kind > 14)
-                     kind = 14;
+                  if (kind > 15)
+                     kind = 15;
                   jjCheckNAddStates(0, 2);
                   break;
                case 16:
