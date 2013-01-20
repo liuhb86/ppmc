@@ -11,7 +11,7 @@ public class PropNot extends StateProperty {
 		System.out.println("}");
 	}
 	@Override
-	public void accept(StatePropertyVisitor visitor) {
+	public void accept(PropertyVisitor visitor) {
 		visitor.visit(this);
 	}
 }

@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.net9.simplex.ppmc.solver.Solver;
 
-public class NotSolver implements Solver {
+public class NotSolver extends Solver {
 
 	Solver c1;
 	int size;

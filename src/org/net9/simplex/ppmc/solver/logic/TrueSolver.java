@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.net9.simplex.ppmc.solver.Solver;
 
-public class TrueSolver implements Solver {
+public class TrueSolver extends Solver {
 
 	int size;
 	
@@ -22,6 +22,11 @@ public class TrueSolver implements Solver {
 		BitSet bs = new BitSet(size);
 		bs.set(0, size);
 		return bs;
+	}
+	
+	@Override
+	public boolean isConstant(){
+		return true;
 	}
 
 }

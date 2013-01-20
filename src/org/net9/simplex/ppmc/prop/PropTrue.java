@@ -5,7 +5,7 @@ public class PropTrue extends StateProperty {
 		System.out.println("True");
 	}
 	@Override
-	public void accept(StatePropertyVisitor visitor) {
+	public void accept(PropertyVisitor visitor) {
 		visitor.visit(this);
 	}
 }

@@ -75,4 +75,4 @@ StateProperty stateElement() :
 | t = < IDENT >
   {
 	return new PropAtom(t.image);
-  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  (  LOOKAHEAD(2)  [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* [<DELIM >] "}"  {    return ps;  }}
+  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  (  LOOKAHEAD(2)  [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* [<DELIM >] "}"  {    return ps;  }| < PROB > [<DELIM >]  t = < COMP >  {    String comparator = t.image;    PathProperty path;  }  [<DELIM >] (    t = < FLOAT >    |    t = < INTEGER >  )  {    double prob = Double.parseDouble(t.image);  }  [<DELIM >] "("  [<DELIM >]  path = pathFormula()  [<DELIM >] ")"  {    return new PropProb(path, comparator, prob);  }}PathProperty pathFormula():{  StateProperty p1,p2;}{  < EVENTUALLY >  p1 =stateFormula()  {    return new PropEventually(p1);  }}

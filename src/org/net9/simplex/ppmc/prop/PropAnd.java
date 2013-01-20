@@ -18,7 +18,7 @@ public class PropAnd extends StateProperty {
 	}
 	
 	@Override
-	public void accept(StatePropertyVisitor visitor) {
+	public void accept(PropertyVisitor visitor) {
 		visitor.visit(this);
 	}
 }

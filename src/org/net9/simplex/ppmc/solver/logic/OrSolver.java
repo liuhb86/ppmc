@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 import org.net9.simplex.ppmc.solver.Solver;
 
-public class OrSolver implements Solver{
+public class OrSolver extends Solver{
 	public LinkedList<Solver> item = new LinkedList<Solver>();
 	
 	public OrSolver(Solver s1, Solver s2) {

@@ -15,7 +15,7 @@ public class PropSet extends StateProperty {
 	}
 
 	@Override
-	public void accept(StatePropertyVisitor visitor) {
+	public void accept(PropertyVisitor visitor) {
 		visitor.visit(this);
 	}
 }

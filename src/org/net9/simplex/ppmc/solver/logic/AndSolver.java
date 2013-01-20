@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 import org.net9.simplex.ppmc.solver.Solver;
 
-public class AndSolver implements Solver {
+public class AndSolver extends Solver {
 
 	public LinkedList<Solver> item = new LinkedList<Solver>();
 	

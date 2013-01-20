@@ -6,7 +6,7 @@ import org.net9.simplex.ppmc.prop.*;
 import org.net9.simplex.ppmc.solver.Solver;
 import org.net9.simplex.ppmc.solver.logic.*;
 
-public class SimplePCTLChecker implements StatePropertyVisitor {
+public class SimplePCTLChecker implements PropertyVisitor {
 	SimpleDTMC model;
 	
 	final Solver sTrue, sFalse;
@@ -25,10 +25,10 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 	public Solver check(StateProperty p){
 		initState = model.currentState;
 		isNested = false;
-		p.accept((StatePropertyVisitor)this);
+		p.accept(this);
 		return this.result;
 	}
-
+	
 	@Override
 	public void visit(PropTrue p) {
 		this.result = sTrue;
@@ -46,7 +46,8 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 
 	@Override
 	public void visit(PropNot p) {
-		this.check(p.p1);
+		p.p1.accept(this);
+		p.p1.accept(this);
 		Solver s = this.result;
 		if (s==sTrue) this.result = sFalse;
 		else if (s==sFalse) this.result = sTrue;
@@ -61,25 +62,25 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 	@Override
 	public void visit(PropAnd p) {
 		AndSolver sc = new AndSolver();
-		AndSolver ss = new AndSolver();
+		AndSolver constSolver = new AndSolver();
 		for (StateProperty sp: p.item){
-			this.check(sp);
+			sp.accept(this);
 			Solver s = this.result;
 			if (s==sFalse) {
 				this.result = sFalse;
 				return;
 			}
 			if (s==sTrue) continue;
-			if (s instanceof SetSolver) 
-				ss.item.add(s);
+			if (s.isConstant()) 
+				constSolver.item.add(s);
 			else
 				sc.item.add(s);
 		}
-		switch(ss.item.size()){
+		switch(constSolver.item.size()){
 		case 0: break;
-		case 1: sc.item.add(ss.item.getFirst()); break;
-		default: 
-			Solver s = this.getCombinedSolver(ss);
+		case 1: sc.item.add(constSolver.item.getFirst()); break;
+		default:
+			Solver s = this.getCombinedSolver(constSolver);
 			if (s==sFalse) {
 				this.result = sFalse;
 				return;
@@ -96,25 +97,25 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 	@Override
 	public void visit(PropOr p) {
 		OrSolver sc = new OrSolver();
-		OrSolver ss = new OrSolver();
+		OrSolver constSolver = new OrSolver();
 		for (StateProperty sp: p.item){
-			this.check(sp);
+			sp.accept(this);
 			Solver s = this.result;
 			if (s==sTrue) {
 				this.result = sTrue;
 				return;
 			}
 			if (s==sFalse) continue;
-			if (s instanceof SetSolver) 
-				ss.item.add(s);
+			if (s.isConstant()) 
+				constSolver.item.add(s);
 			else
 				sc.item.add(s);
 		}
-		switch(ss.item.size()){
+		switch(constSolver.item.size()){
 		case 0: break;
-		case 1: sc.item.add(ss.item.getFirst()); break;
+		case 1: sc.item.add(constSolver.item.getFirst()); break;
 		default: 
-			Solver s = this.getCombinedSolver(ss);
+			Solver s = this.getCombinedSolver(constSolver);
 			if (s==sTrue) {
 				this.result = sTrue;
 				return;
@@ -130,13 +131,25 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 	
 	@Override
 	public void visit(PropSet p) {
-		// TODO Auto-generated method stub
 		if (isNested){
 			this.result = new SetSolver(p.item, model.size());
 		} else {
 			this.result = this.getConstSolver(p.item.contains(model.currentState));
 		}
 	}
+	
+	@Override
+	public void visit(PropProb p) {
+		p.isNested = this.isNested;
+		this.isNested = true;
+		p.p1.accept(this);
+		this.isNested = p.isNested;
+	}
+
+	@Override
+	public void visit(PropEventually p) {
+		
+	}	
 	
 	Solver getConstSolver(boolean b) {
 		return b? sTrue: sFalse;
@@ -147,5 +160,7 @@ public class SimplePCTLChecker implements StatePropertyVisitor {
 		if (bs.cardinality()== model.size()) return sTrue;
 		else if (bs.cardinality()== 0) return sFalse;
 		return new SetSolver(bs);
-	}	
+	}
+
+
 }

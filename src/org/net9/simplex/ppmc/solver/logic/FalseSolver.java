@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.net9.simplex.ppmc.solver.Solver;
 
-public class FalseSolver implements Solver {
+public class FalseSolver extends Solver {
 
 	int size;
 	
@@ -21,5 +21,10 @@ public class FalseSolver implements Solver {
 	public BitSet solveSet(HashMap<String, Double> val) {
 		BitSet bs = new BitSet(size);
 		return bs;
+	}
+	
+	@Override
+	public boolean isConstant(){
+		return true;
 	}
 }

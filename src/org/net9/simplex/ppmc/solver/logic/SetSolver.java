@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.net9.simplex.ppmc.solver.Solver;
 
-public class SetSolver implements Solver {
+public class SetSolver extends Solver {
 
 	BitSet item;
 	public SetSolver(BitSet item){
@@ -28,5 +28,10 @@ public class SetSolver implements Solver {
 	@Override
 	public BitSet solveSet(HashMap<String, Double> val) {
 		return (BitSet) item.clone();
+	}
+	
+	@Override
+	public boolean isConstant(){
+		return true;
 	}
 }
