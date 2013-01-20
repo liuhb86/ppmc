@@ -17,6 +17,7 @@ public class PropProb extends StateProperty {
 		this.strComparator = comparator;
 		this.prob = prob;
 		this.comparator = comparatorMap.get(comparator);
+		if (path!=null) path.parent = this;
 	}
 
 	@Override

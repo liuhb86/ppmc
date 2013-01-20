@@ -15,6 +15,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 	int initState;
 	boolean isNested;
 	Solver result;
+	SimpleReachabilityChecker reachChecker;
 	
 	public SimplePCTLChecker (SimpleDTMC model) {
 		this.model = model;
@@ -148,7 +149,26 @@ public class SimplePCTLChecker implements PropertyVisitor {
 
 	@Override
 	public void visit(PropEventually p) {
-		
+		p.p1.accept(this);
+		Solver s = this.result;
+		if (!s.isConstant()){
+			//TODO : run time solver
+			this.result = this.getConstSolver(false);
+		}
+		BitSet bs = s.solveSet(null);
+		SimpleReachabilityChecker rc;
+		int destState;
+		if (bs.cardinality()==1) {
+			rc = this.getReachabilityChecker();
+			destState = bs.nextSetBit(0);
+		} else {
+			// TODO: build new model and checker
+			rc = this.getReachabilityChecker();
+			destState = bs.nextSetBit(0);
+		}
+		if (p.parent.isNested) {
+			// TODO : return set solver
+		}
 	}	
 	
 	Solver getConstSolver(boolean b) {
@@ -161,6 +181,11 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		else if (bs.cardinality()== 0) return sFalse;
 		return new SetSolver(bs);
 	}
-
+	
+	SimpleReachabilityChecker getReachabilityChecker(){
+		if (this.reachChecker==null)
+			this.reachChecker = new SimpleReachabilityChecker(model);
+		return this.reachChecker;
+	}
 
 }
