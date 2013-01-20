@@ -1,10 +1,14 @@
 package org.net9.simplex.ppmc.solver;
 
 import java.util.BitSet;
+
+import org.lsmp.djep.xjep.NodeFactory;
+import org.lsmp.djep.xjep.XJep;
 import org.net9.simplex.ppmc.core.Assignment;
 import org.net9.simplex.ppmc.util.BinaryPredicator;
 import org.nfunk.jep.ASTConstant;
 import org.nfunk.jep.Node;
+import org.nfunk.jep.ParseException;
 
 public class ExpressionSolver extends Solver implements NumericSolver{
 	Node expr;
@@ -50,5 +54,23 @@ public class ExpressionSolver extends Solver implements NumericSolver{
 	@Override
 	public boolean isSingle() {
 		return true;
+	}
+
+	@Override
+	public void complement() {
+		if (expr instanceof ASTConstant){
+			((ASTConstant) expr).setValue(1-Assignment.evaluateConst(expr));
+		} else {
+			XJep jep = new XJep();
+			NodeFactory nf = jep.getNodeFactory();
+			try {
+				expr = nf.buildOperatorNode(
+						jep.getOperatorSet().getSubtract(),
+						nf.buildConstantNode(1),
+						expr);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

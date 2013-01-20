@@ -1,8 +1,6 @@
 package org.net9.simplex.ppmc.solver;
 
 import java.util.BitSet;
-import java.util.HashMap;
-
 import org.net9.simplex.ppmc.core.Assignment;
 
 public abstract class Solver {

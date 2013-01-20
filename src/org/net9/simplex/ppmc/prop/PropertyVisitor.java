@@ -9,4 +9,6 @@ public interface PropertyVisitor {
 	void visit(PropSet p);
 	void visit(PropProb p);
 	void visit(PropEventually p);
+	void visit(PropAlways propAlways);
+	void visit(PropNext propNext);
 }

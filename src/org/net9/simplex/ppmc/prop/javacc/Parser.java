@@ -291,6 +291,7 @@ public class Parser implements ParserConstants {
 
   final public PathProperty pathFormula() throws ParseException {
   StateProperty p1,p2;
+  Token t;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case EVENTUALLY:
       jj_consume_token(EVENTUALLY);
@@ -316,7 +317,7 @@ public class Parser implements ParserConstants {
         ;
       }
       p1 = stateFormula();
-    {if (true) return new PropEventually(p1);}
+    {if (true) return new PropAlways(p1);}
       break;
     case NEXT:
       jj_consume_token(NEXT);
@@ -328,14 +329,15 @@ public class Parser implements ParserConstants {
         jj_la1[21] = jj_gen;
         ;
       }
-      stateFormula();
+      p1 = stateFormula();
+    {if (true) return new PropNext(p1);}
       break;
     case TRUE:
     case PROB:
     case IDENT:
     case 18:
     case 20:
-      stateFormula();
+      p1 = stateFormula();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DELIM:
         jj_consume_token(DELIM);
@@ -345,6 +347,7 @@ public class Parser implements ParserConstants {
         ;
       }
       jj_consume_token(UNTIL);
+    PathProperty p;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DELIM:
         jj_consume_token(DELIM);
@@ -355,7 +358,8 @@ public class Parser implements ParserConstants {
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMP:
-        jj_consume_token(COMP);
+        t = jj_consume_token(COMP);
+      if (!t.image.equals("<")) {if (true) throw generateParseException();}
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case DELIM:
           jj_consume_token(DELIM);
@@ -364,7 +368,7 @@ public class Parser implements ParserConstants {
           jj_la1[24] = jj_gen;
           ;
         }
-        jj_consume_token(INTEGER);
+        t = jj_consume_token(INTEGER);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case DELIM:
           jj_consume_token(DELIM);

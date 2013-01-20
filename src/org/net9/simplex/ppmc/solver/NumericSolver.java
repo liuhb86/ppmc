@@ -8,4 +8,5 @@ public interface NumericSolver {
 	public double solveNumeric(Assignment val, int index);
 	public void setConstraints(BinaryPredicator<Double,Double> pred, double value);
 	public boolean isSingle();
+	public void complement();
 }

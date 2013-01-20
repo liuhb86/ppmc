@@ -6,14 +6,14 @@ import org.nfunk.jep.ParseException;
 
 public class Assignment {
 	//TODO: implement
-	static  final Assignment nullAssignment = new Assignment();
+	public static  final Assignment nullAssignment = new Assignment();
 	XJep jep;
 	
 	public Assignment() {
 		jep = new XJep();
 	}
 	
-	static double evaluateConst(Node expr)throws IllegalArgumentException{
+	public static double evaluateConst(Node expr)throws IllegalArgumentException{
 		return nullAssignment.evaluate(expr);
 	}
 	

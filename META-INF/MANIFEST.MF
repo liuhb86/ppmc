@@ -19,10 +19,8 @@ Export-Package:
  org.net9.simplex.ppmc.gen;uses:="org.net9.simplex.ppmc.util,org.net9.simplex.ppmc.core",
  org.net9.simplex.ppmc.mat,
  org.net9.simplex.ppmc.prop,
- org.net9.simplex.ppmc.prop.parser;uses:="org.net9.simplex.ppmc.prop",
  org.net9.simplex.ppmc.solver,
  org.net9.simplex.ppmc.solver.logic,
- org.net9.simplex.ppmc.test,
  org.net9.simplex.ppmc.util
 Bundle-Vendor: Hongbo Liu
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -24,6 +24,24 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		this.sFalse = new FalseSolver(model.size());
 	}
 	
+	Solver getConstSolver(boolean b) {
+		return b? sTrue: sFalse;
+	}
+	
+	Solver getCombinedSolver(Solver s) {
+		if (s==sTrue || s==sFalse) return s;
+		BitSet bs = s.solveSet(null);
+		if (bs.cardinality()== model.size()) return sTrue;
+		else if (bs.cardinality()== 0) return sFalse;
+		return new SetSolver(bs);
+	}
+	
+	SimpleReachabilityChecker getReachabilityChecker(){
+		if (this.reachChecker==null)
+			this.reachChecker = new SimpleReachabilityChecker(model);
+		return this.reachChecker;
+	}
+	
 	public Solver check(StateProperty p){
 		initState = model.currentState;
 		isNested = false;
@@ -49,16 +67,14 @@ public class SimplePCTLChecker implements PropertyVisitor {
 	@Override
 	public void visit(PropNot p) {
 		p.p1.accept(this);
-		p.p1.accept(this);
 		Solver s = this.result;
 		if (s==sTrue) this.result = sFalse;
 		else if (s==sFalse) this.result = sTrue;
 		else {
 			this.result = new NotSolver(s, model.size());
-			if (s instanceof SetSolver) 
+			if (s.isConstant()) 
 				this.result = this.getCombinedSolver(this.result);
-		}
-		
+		}	
 	}
 
 	@Override
@@ -179,22 +195,19 @@ public class SimplePCTLChecker implements PropertyVisitor {
 			this.result = new ExpressionSolver(exp);
 		}
 	}	
-	
-	Solver getConstSolver(boolean b) {
-		return b? sTrue: sFalse;
+
+	@Override
+	public void visit(PropAlways p) {
+		PropEventually eventually = 
+				new PropEventually(new PropNot(p.p1));
+		eventually.accept(this);
+		((NumericSolver) this.result).complement();
 	}
-	
-	Solver getCombinedSolver(Solver s) {
-		BitSet bs = s.solveSet(null);
-		if (bs.cardinality()== model.size()) return sTrue;
-		else if (bs.cardinality()== 0) return sFalse;
-		return new SetSolver(bs);
-	}
-	
-	SimpleReachabilityChecker getReachabilityChecker(){
-		if (this.reachChecker==null)
-			this.reachChecker = new SimpleReachabilityChecker(model);
-		return this.reachChecker;
+
+	@Override
+	public void visit(PropNext p) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 }
