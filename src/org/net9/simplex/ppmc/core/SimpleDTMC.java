@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -47,14 +46,6 @@ public class SimpleDTMC implements DTMC {
 		this.trans = new SmartMatrix(transitionMatrix,var);
 		this.ap = ap;
 	}
-	
-	/* (non-Javadoc)
-	 * @see core.DTMC#getCurrentNode()
-	 */
-	@Override
-	public Node getCurrentNode() {
-		return new Node("n"+this.currentState,this.currentState);
-	}
 
 	/* (non-Javadoc)
 	 * @see core.DTMC#isAbsorbed()
@@ -86,16 +77,6 @@ public class SimpleDTMC implements DTMC {
 	@Override
 	public void reset() {
 		this.currentState=0;
-	}
-
-	@Override
-	public Node[] getNodeSet() {
-		ArrayList<Node> ret = new ArrayList<Node>();
-		for(int i=0;i<trans.getDim();i++){
-			ret.add(new Node("n"+i,i));
-		}
-		Node[] n =new Node[ret.size()];
-		return ret.toArray(n);
 	}
 
 	@Override

@@ -3,8 +3,8 @@ package org.net9.simplex.ppmc.test;
 import java.text.ParseException;
 import java.util.Scanner;
 
+import org.net9.simplex.ppmc.prop.PropertyParser;
 import org.net9.simplex.ppmc.prop.StateProperty;
-import org.net9.simplex.ppmc.prop.parser.PropertyParser;
 
 
 public class PropParserTest {
@@ -18,7 +18,7 @@ public class PropParserTest {
 		PropertyParser parser= new PropertyParser();
 		while(true) {
 			String line = s.nextLine();
-			if (s.equals("q")) break;
+			if (line.equals("q")) break;
 			try {
 				StateProperty p = parser.parse(line);
 				p.print();

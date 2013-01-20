@@ -1,5 +1,5 @@
 options{  STATIC = false;  SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
-  UNICODE_INPUT = true;}PARSER_BEGIN(Parser)package org.net9.simplex.ppmc.prop.parser.javacc;
+  UNICODE_INPUT = true;}PARSER_BEGIN(Parser)package org.net9.simplex.ppmc.prop.javacc;
 import java.io.Reader;
 import java.io.StringReader;
 
@@ -22,7 +22,7 @@ TOKEN :
 }TOKEN : {  < NEXT : "X" >| < EVENTUALLY : "<>" >| < ALWAYS : "[]" >| < UNTIL : "U" >}TOKEN :{  < COMP : "<=" | "<" | ">=" |">" >
 | <#DIGIT : ["0" - "9"] >
 | <INTEGER : (<DIGIT>)+ >
-| <FLOAT : (<DIGIT>)+ "." (<DIGIT>)+>
+| <FLOAT : (<DIGIT>)* "." (<DIGIT>)+>
 | <IDENT : ["A" - "Z", "a" -"z", "_"](["A" - "Z", "a" -"z" ,"0"-"9", "_"])* >}
 
 StateProperty start() :{  StateProperty p;
@@ -75,4 +75,4 @@ StateProperty stateElement() :
 | t = < IDENT >
   {
 	return new PropAtom(t.image);
-  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  (  LOOKAHEAD(2)  [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* [<DELIM >] "}"  {    return ps;  }| < PROB > [<DELIM >]  t = < COMP >  {    String comparator = t.image;    PathProperty path;  }  [<DELIM >] (    t = < FLOAT >    |    t = < INTEGER >  )  {    double prob = Double.parseDouble(t.image);  }  [<DELIM >] "("  [<DELIM >]  path = pathFormula()  [<DELIM >] ")"  {    return new PropProb(path, comparator, prob);  }}PathProperty pathFormula():{  StateProperty p1,p2;}{  < EVENTUALLY >  p1 =stateFormula()  {    return new PropEventually(p1);  }}
+  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  (  LOOKAHEAD(2)  [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* [<DELIM >] "}"  {    return ps;  }| < PROB > [<DELIM >]  t = < COMP >  {    String comparator = t.image;    PathProperty path;  }  [<DELIM >] (    t = < FLOAT >    |    t = < INTEGER >  )  {    double prob = Double.parseDouble(t.image);  }  [<DELIM >] "("  [<DELIM >]  path = pathFormula()  [<DELIM >] ")"  {    return new PropProb(path, comparator, prob);  }}PathProperty pathFormula():{  StateProperty p1,p2;}{  < EVENTUALLY > [<DELIM >]  p1 =stateFormula()  {    return new PropEventually(p1);  }| < ALWAYS > [<DELIM >]  p1 =stateFormula()  {    return new PropEventually(p1);  }|  < NEXT > [<DELIM >]  stateFormula()|  stateFormula()  [<DELIM >] < UNTIL > [<DELIM >]  [ < COMP > [<DELIM >]	  < INTEGER >	  [<DELIM >]  ]  stateFormula()}

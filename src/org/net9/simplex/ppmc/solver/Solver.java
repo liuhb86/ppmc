@@ -3,10 +3,12 @@ package org.net9.simplex.ppmc.solver;
 import java.util.BitSet;
 import java.util.HashMap;
 
+import org.net9.simplex.ppmc.core.Assignment;
+
 public abstract class Solver {
 	boolean isConstant = false;
-	public abstract boolean solve(HashMap<String, Double> val);
-	public abstract BitSet solveSet(HashMap<String, Double> val);
+	public abstract boolean solve(Assignment val);
+	public abstract BitSet solveSet(Assignment val);
 	public boolean isConstant(){
 		return isConstant;
 	}

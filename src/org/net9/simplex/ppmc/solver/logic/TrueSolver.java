@@ -1,8 +1,7 @@
 package org.net9.simplex.ppmc.solver.logic;
 
 import java.util.BitSet;
-import java.util.HashMap;
-
+import org.net9.simplex.ppmc.core.Assignment;
 import org.net9.simplex.ppmc.solver.Solver;
 
 public class TrueSolver extends Solver {
@@ -13,12 +12,12 @@ public class TrueSolver extends Solver {
 		this.size = size;
 	}
 	@Override
-	public boolean solve(HashMap<String, Double> val) {
+	public boolean solve(Assignment val) {
 		return true;
 	}
 
 	@Override
-	public BitSet solveSet(HashMap<String, Double> val) {
+	public BitSet solveSet(Assignment val) {
 		BitSet bs = new BitSet(size);
 		bs.set(0, size);
 		return bs;

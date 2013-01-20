@@ -1,4 +1,4 @@
-package org.net9.simplex.ppmc.prop.parser.javacc;
+package org.net9.simplex.ppmc.prop.javacc;
 
 import org.net9.simplex.ppmc.util.JavaCCParseException;
 

@@ -14,11 +14,7 @@ public interface DTMC {
 	
 	public boolean isAbsorbed();
 	
-	public Node getCurrentNode();
-	
 	public void move(double dice);
-	
-	public Node[] getNodeSet();
 	
 	public void toFile(String path) throws IOException;
 	

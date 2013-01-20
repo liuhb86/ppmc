@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 import org.net9.simplex.ppmc.checker.SimplePCTLChecker;
 import org.net9.simplex.ppmc.core.SimpleDTMC;
+import org.net9.simplex.ppmc.prop.PropertyParser;
 import org.net9.simplex.ppmc.prop.StateProperty;
-import org.net9.simplex.ppmc.prop.parser.PropertyParser;
 import org.net9.simplex.ppmc.solver.Solver;
 import org.net9.simplex.ppmc.util.Stdio;
 
@@ -39,9 +39,9 @@ public class SimplePCTLCheckerTest {
 		StateProperty p;
 		while(true) {
 			String line = s.nextLine();
-			if (s.equals("q")) break;
+			if (line.equals("q")) break;
 			try {
-				 p = parser.parse(line);
+				p = parser.parse(line);
 				p.print();
 			} catch (ParseException e) {
 				System.out.println(e.toString());

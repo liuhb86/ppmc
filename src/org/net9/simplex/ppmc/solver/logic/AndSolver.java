@@ -1,9 +1,9 @@
 package org.net9.simplex.ppmc.solver.logic;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.net9.simplex.ppmc.core.Assignment;
 import org.net9.simplex.ppmc.solver.Solver;
 
 public class AndSolver extends Solver {
@@ -18,7 +18,7 @@ public class AndSolver extends Solver {
 	}
 	
 	@Override
-	public boolean solve(HashMap<String, Double> val) {
+	public boolean solve(Assignment val) {
 		for (Solver s:item){
 			if (!s.solve(val)) return false;
 		}
@@ -26,7 +26,7 @@ public class AndSolver extends Solver {
 	}
 
 	@Override
-	public BitSet solveSet(HashMap<String, Double> val) {
+	public BitSet solveSet(Assignment val) {
 		BitSet bs = new BitSet();
 		for (Solver s:item)
 		bs.and(s.solveSet(val));

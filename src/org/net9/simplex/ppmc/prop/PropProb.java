@@ -6,9 +6,9 @@ import org.net9.simplex.ppmc.util.BinaryPredicator;
 
 public class PropProb extends StateProperty {
 	public PathProperty p1;
-	String strComparator;
-	BinaryPredicator<Double, Double> comparator;
-	double prob;
+	public String strComparator;
+	public BinaryPredicator<Double, Double> comparator;
+	public double prob;
 	static final HashMap<String, BinaryPredicator<Double, Double>> 
 		comparatorMap =  new HashMap<String, BinaryPredicator<Double, Double>>();
 	

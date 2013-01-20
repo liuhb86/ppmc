@@ -1,9 +1,8 @@
-package org.net9.simplex.ppmc.prop.parser;
+package org.net9.simplex.ppmc.prop;
 
 import java.text.ParseException;
 
-import org.net9.simplex.ppmc.prop.StateProperty;
-import org.net9.simplex.ppmc.prop.parser.javacc.Parser;
+import org.net9.simplex.ppmc.prop.javacc.Parser;
 
 public class PropertyParser {
 	Parser parser = new Parser();

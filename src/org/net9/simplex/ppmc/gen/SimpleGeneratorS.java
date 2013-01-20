@@ -68,7 +68,7 @@ public class SimpleGeneratorS implements Callable<String>{
 		
 			long letSee=System.currentTimeMillis();
 			SimpleReachabilityChecker solver = new SimpleReachabilityChecker(res);
-			String result = solver.check(from, to);
+			String result = solver.checkToString(from, to);
 			System.out.println(result);
 			long designTime=(System.currentTimeMillis()-letSee)/1000;
 			PrintWriter fOut=new PrintWriter(new FileOutputStream(this.runID+"DT.log"));

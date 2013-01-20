@@ -8,6 +8,8 @@ import org.net9.simplex.ppmc.core.SimpleDTMC;
 import org.net9.simplex.ppmc.mat.MatrixIndex;
 import org.net9.simplex.ppmc.mat.SmartMatrix;
 import org.net9.simplex.ppmc.mat.SparseMatrix;
+import org.net9.simplex.ppmc.util.Stdio;
+import org.nfunk.jep.Node;
 import org.nfunk.jep.ParseException;
 
 public class SimpleReachabilityChecker {
@@ -20,6 +22,7 @@ public class SimpleReachabilityChecker {
 	public SimpleReachabilityChecker(SimpleDTMC model) {
 		this.model = model;
 		jep.setAllowUndeclared(true);
+		jep.setAllowAssignment(false);
 	}
 	
 	public SmartMatrix getM(){
@@ -43,7 +46,7 @@ public class SimpleReachabilityChecker {
 		return this.M;
 	}
 	
-	public String check(int from, int to) {
+	public Node check(int from, int to) {
 		if (model.isAbsorbingState(from))
 			return this.checkA2S(from, to);
 		if (model.isAbsorbingState(to)) 
@@ -51,9 +54,18 @@ public class SimpleReachabilityChecker {
 		return this.checkT2T(from, to);
 	}
 	
-	String checkA2S(int from, int to) {
-		//assert(from>=model.numTransients);
-		return (from==to)?"1":"0";
+	public String checkToString(int from, int to) {
+		return jep.toString(this.check(from, to));
+		
+	}
+	
+	Node checkA2S(int from, int to) {
+		assert(from>=model.numTransients);
+		try {
+			return jep.parse((from==to)?"1":"0");
+		} catch (ParseException e) {
+			return null;
+		}
 	}
 	
 	/**
@@ -62,7 +74,7 @@ public class SimpleReachabilityChecker {
 	 * @param to
 	 * @return
 	 */
-	String checkT2T(int from, int to) {
+	Node checkT2T(int from, int to) {
 		//assert(from<model.numTransients);
 		//assert(to<model.numTransients);
 		String aji = this.getCofactor(to, from);
@@ -76,7 +88,7 @@ public class SimpleReachabilityChecker {
 	 * @param to
 	 * @return
 	 */
-	public String checkT2A(int from, int to) {
+	public Node checkT2A(int from, int to) {
 		//assert(from<model.numTransients);
 		//assert(to>=model.numTransients);
 
@@ -96,7 +108,7 @@ public class SimpleReachabilityChecker {
 		}	
 		String both="("+num.toString()+")/("+deta+")";
 	
-		String simpl= simplify(both);
+		Node simpl= simplify(both);
 		return simpl; 
 	}
 	
@@ -111,13 +123,13 @@ public class SimpleReachabilityChecker {
 		return c;
 	}
 	
-	String simplify(String expr){
+	Node simplify(String expr){
 		try {
-			return jep.toString(simplifier.simplify(jep.parse(expr)));
+			return simplifier.simplify(jep.parse(expr));
 		} catch (ParseException e) {
-			System.out.println(expr);
+			Stdio.out.println(expr);
 			e.printStackTrace();
-			return "-1";
+			return null;
 		}
 	}
 		

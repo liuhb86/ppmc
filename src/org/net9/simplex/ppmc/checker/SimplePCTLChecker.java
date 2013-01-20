@@ -3,8 +3,9 @@ package org.net9.simplex.ppmc.checker;
 import java.util.BitSet;
 import org.net9.simplex.ppmc.core.SimpleDTMC;
 import org.net9.simplex.ppmc.prop.*;
-import org.net9.simplex.ppmc.solver.Solver;
+import org.net9.simplex.ppmc.solver.*;
 import org.net9.simplex.ppmc.solver.logic.*;
+import org.nfunk.jep.Node;
 
 public class SimplePCTLChecker implements PropertyVisitor {
 	SimpleDTMC model;
@@ -135,7 +136,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		if (isNested){
 			this.result = new SetSolver(p.item, model.size());
 		} else {
-			this.result = this.getConstSolver(p.item.contains(model.currentState));
+			this.result = this.getConstSolver(p.item.contains(initState));
 		}
 	}
 	
@@ -144,6 +145,11 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		p.isNested = this.isNested;
 		this.isNested = true;
 		p.p1.accept(this);
+		ExpressionSolver s = (ExpressionSolver) this.result;
+		s.setConstraints(p.comparator, p.prob);
+		if (s.isConstant() && s.isSingle()){
+			this.result = this.getConstSolver(s.solve(null));
+		}
 		this.isNested = p.isNested;
 	}
 
@@ -153,7 +159,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		Solver s = this.result;
 		if (!s.isConstant()){
 			//TODO : run time solver
-			this.result = this.getConstSolver(false);
+			throw new UnsupportedOperationException();
 		}
 		BitSet bs = s.solveSet(null);
 		SimpleReachabilityChecker rc;
@@ -163,11 +169,14 @@ public class SimplePCTLChecker implements PropertyVisitor {
 			destState = bs.nextSetBit(0);
 		} else {
 			// TODO: build new model and checker
-			rc = this.getReachabilityChecker();
-			destState = bs.nextSetBit(0);
+			throw new UnsupportedOperationException();
 		}
 		if (p.parent.isNested) {
 			// TODO : return set solver
+			throw new UnsupportedOperationException();
+		} else {
+			Node exp = rc.check(initState, destState);
+			this.result = new ExpressionSolver(exp);
 		}
 	}	
 	
