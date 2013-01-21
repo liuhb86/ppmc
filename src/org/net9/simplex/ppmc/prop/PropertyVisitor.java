@@ -11,4 +11,6 @@ public interface PropertyVisitor {
 	void visit(PropEventually p);
 	void visit(PropAlways propAlways);
 	void visit(PropNext propNext);
+	void visit(PropUntil propUntil);
+	void visit(PropBoundedUntil propBoundedUntil);
 }

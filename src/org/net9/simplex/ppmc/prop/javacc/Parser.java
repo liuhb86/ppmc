@@ -347,7 +347,8 @@ public class Parser implements ParserConstants {
         ;
       }
       jj_consume_token(UNTIL);
-    PathProperty p;
+    boolean bounded = false;
+    int bound = 0;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DELIM:
         jj_consume_token(DELIM);
@@ -369,6 +370,8 @@ public class Parser implements ParserConstants {
           ;
         }
         t = jj_consume_token(INTEGER);
+          bounded = true;
+          bound = Integer.parseInt(t.image);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case DELIM:
           jj_consume_token(DELIM);
@@ -382,7 +385,14 @@ public class Parser implements ParserConstants {
         jj_la1[26] = jj_gen;
         ;
       }
-      stateFormula();
+      p2 = stateFormula();
+     if (bounded)
+     {
+       {if (true) return new PropBoundedUntil(p1,p2,bound);}
+     } else
+     {
+       {if (true) return new PropUntil(p1,p2);}
+     }
       break;
     default:
       jj_la1[27] = jj_gen;

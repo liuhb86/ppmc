@@ -17,6 +17,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 	boolean isNested;
 	Solver result;
 	SimpleReachabilityChecker reachChecker;
+	NextChecker nextChecker;
 	
 	public SimplePCTLChecker (SimpleDTMC model) {
 		this.model = model;
@@ -28,7 +29,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		return b? sTrue: sFalse;
 	}
 	
-	Solver getCombinedSolver(Solver s) {
+	Solver getSetSolver(Solver s) {
 		if (s==sTrue || s==sFalse) return s;
 		BitSet bs = s.solveSet(null);
 		if (bs.cardinality()== model.size()) return sTrue;
@@ -40,6 +41,12 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		if (this.reachChecker==null)
 			this.reachChecker = new SimpleReachabilityChecker(model);
 		return this.reachChecker;
+	}
+	NextChecker getNextChecker() {
+		if (this.nextChecker==null)
+			this.nextChecker = new NextChecker(model.trans);
+		return this.nextChecker;
+		
 	}
 	
 	public Solver check(StateProperty p){
@@ -73,7 +80,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		else {
 			this.result = new NotSolver(s, model.size());
 			if (s.isConstant()) 
-				this.result = this.getCombinedSolver(this.result);
+				this.result = this.getSetSolver(this.result);
 		}	
 	}
 
@@ -98,7 +105,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		case 0: break;
 		case 1: sc.item.add(constSolver.item.getFirst()); break;
 		default:
-			Solver s = this.getCombinedSolver(constSolver);
+			Solver s = this.getSetSolver(constSolver);
 			if (s==sFalse) {
 				this.result = sFalse;
 				return;
@@ -133,7 +140,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		case 0: break;
 		case 1: sc.item.add(constSolver.item.getFirst()); break;
 		default: 
-			Solver s = this.getCombinedSolver(constSolver);
+			Solver s = this.getSetSolver(constSolver);
 			if (s==sTrue) {
 				this.result = sTrue;
 				return;
@@ -163,8 +170,12 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		p.p1.accept(this);
 		ExpressionSolver s = (ExpressionSolver) this.result;
 		s.setConstraints(p.comparator, p.prob);
-		if (s.isConstant() && s.isSingle()){
-			this.result = this.getConstSolver(s.solve(null));
+		if (s.isConstant()){
+			if (s.isSingle()) {
+				this.result = this.getConstSolver(s.solve(null));
+			} else {
+				this.result = this.getSetSolver(s);
+			}
 		}
 		this.isNested = p.isNested;
 	}
@@ -206,6 +217,70 @@ public class SimplePCTLChecker implements PropertyVisitor {
 
 	@Override
 	public void visit(PropNext p) {
+		p.p1.accept(this);
+		Solver s = this.result;
+		if (!s.isConstant()){
+			//TODO : run time solver
+			throw new UnsupportedOperationException();
+		}
+		
+		if (p.parent.isNested) {
+			// TODO : return set solver
+			throw new UnsupportedOperationException();
+		} else {
+			NextChecker nextChecker = this.getNextChecker();
+			Node exp = nextChecker.check(this.initState, s.solveSet(null));
+			this.result = new ExpressionSolver(exp);
+		}
+	}
+
+	@Override
+	public void visit(PropUntil p) {
+		p.p1.accept(this);
+		Solver s1 = this.result;
+		if (!s1.isConstant()){
+			//TODO : run time solver
+			throw new UnsupportedOperationException();
+		}
+		BitSet bs1 = s1.solveSet(null);
+		if (bs1.cardinality() == model.size()){
+			PropEventually eventually = 
+					new PropEventually(p.p2);
+			eventually.accept(this);
+			return;
+		}
+		
+		p.p2.accept(this);
+		Solver s2 = this.result;
+		if (!s2.isConstant()){
+			//TODO : run time solver
+			throw new UnsupportedOperationException();
+		}
+		BitSet bs2 = s2.solveSet(null);
+		BitSet bs = (BitSet) bs1.clone();
+		bs.or(bs2);
+		
+		if (bs.isEmpty()){
+			this.result = this.getConstSolver(false);
+			return;
+		} else if (bs.cardinality() == bs.size()){
+			PropEventually eventually = 
+					new PropEventually(p.p2);
+			eventually.accept(this);
+			return;
+		}
+		
+		if (p.parent.isNested) {
+			// TODO : return set solver
+			throw new UnsupportedOperationException();
+		} else {
+			// TODO: build new model and checker
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	@Override
+	public void visit(PropBoundedUntil propBoundedUntil) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}

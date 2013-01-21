@@ -32,6 +32,8 @@ public class SimpleDTMC implements DTMC {
 	public int numTransients;
 	public HashMap<String, BitSet> ap;
 
+	SimpleDTMC(){	
+	}
 	public SimpleDTMC(double[][] transitionMatrix,int numTransients){
 		init(transitionMatrix, new SparseMatrix<String>(), numTransients,0, new HashMap<String, BitSet>());
 	}

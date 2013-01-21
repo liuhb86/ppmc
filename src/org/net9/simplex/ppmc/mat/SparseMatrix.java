@@ -28,6 +28,9 @@ public class SparseMatrix<T> implements Cloneable{
 	public void put(int r,int c, T v) {
 		data.put(new MatrixIndex(r,c), v);
 	}
+	public void remove(int r, int c){
+		data.remove(new MatrixIndex(r,c));
+	}
 	public int size() {
 		return data.size();
 	}

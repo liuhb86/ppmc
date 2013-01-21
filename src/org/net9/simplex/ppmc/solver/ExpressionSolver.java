@@ -11,37 +11,66 @@ import org.nfunk.jep.Node;
 import org.nfunk.jep.ParseException;
 
 public class ExpressionSolver extends Solver implements NumericSolver{
-	Node expr;
+	Node expr = null;
+	Node[] exprArray = null;
+	boolean isSingle;
+	boolean isConst;
 	BinaryPredicator<Double,Double> pred;
 	double value;
 	
 	public ExpressionSolver(Node expr){
 		this.expr = expr;
+		this.isSingle = true;
+		this.isConst = expr instanceof ASTConstant;
+	}
+	
+	public ExpressionSolver(Node[] expr){
+		this.exprArray = expr;
+		this.isSingle = false;
+		this.isConst = true;
+		for(Node n: expr){
+			if (n instanceof ASTConstant) continue;
+			this.isConst = false;
+			break;
+		}
+	}
+
+	public double solveExprNumeric(Assignment val, Node expr) {
+		return Assignment.evaluate(val, expr);	
+	}
+	
+	boolean solveExpr(Assignment val, Node expr){
+		return pred.execute(this.solveExprNumeric(val, expr), value);
 	}
 	
 	@Override
 	public boolean solve(Assignment val) {
-		return pred.execute(this.solveNumeric(val), value);
+		return this.solveExpr(val, this.expr);
 	}
 
 	@Override
 	public BitSet solveSet(Assignment val) {
-		throw new UnsupportedOperationException();
+		int len = exprArray.length;
+		BitSet bs = new BitSet(len);
+		for (int i=0;i<len;++i){
+			bs.set(i, this.solveExpr(val, exprArray[i]));
+		}
+		return bs;
 	}
 	
 	@Override	
 	public boolean isConstant(){
-		return expr instanceof ASTConstant;
+		return this.isConst;
 	}
 
 	@Override
 	public double solveNumeric(Assignment val) {
-		return Assignment.evaluate(val, expr);	
+;		return this.solveExprNumeric(val, this.expr);
 	}
 
 	@Override
 	public double solveNumeric(Assignment val, int index) {
-		throw new UnsupportedOperationException();
+		return this.solveExprNumeric(val, this.exprArray[index]);
 	}
 
 	@Override
@@ -53,11 +82,20 @@ public class ExpressionSolver extends Solver implements NumericSolver{
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return this.isSingle;
 	}
 
 	@Override
 	public void complement() {
+		if (isSingle) {
+			this.expr = this.complementExpr(this.expr);
+		} else {
+			for(int i=0;i<exprArray.length; ++i){
+				exprArray[i]=this.complementExpr(exprArray[i]);
+			}
+		}
+	}
+	public Node complementExpr(Node expr) {
 		if (expr instanceof ASTConstant){
 			((ASTConstant) expr).setValue(1-Assignment.evaluateConst(expr));
 		} else {
@@ -72,5 +110,6 @@ public class ExpressionSolver extends Solver implements NumericSolver{
 				e.printStackTrace();
 			}
 		}
+		return expr;
 	}
 }

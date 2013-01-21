@@ -2,11 +2,11 @@ package org.net9.simplex.ppmc.mat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
 import org.net9.simplex.ppmc.util.Utils;
-
 
 import Jama.Matrix;
 
@@ -181,6 +181,58 @@ public class SmartMatrix {
 		return this.det;
 	}
 	
+	public SmartMatrix increaseSize(int r,int c){
+		int row = this.getDimR()+r;
+		int col = this.getDimC()+c;
+		
+		double[][] par=new double[row][col];
+	
+		for(int i=0;i<this.base.length;i++){
+			for(int j=0;j<this.base[i].length;j++){
+				par[i][j]=this.base[i][j];
+			}
+		}
+		
+		SparseMatrix<String> var= this.vars.clone();
+		return new SmartMatrix(par, var);
+	}
+	
+	public void exchange(HashMap<Integer, Integer>row, HashMap<Integer,Integer>col){
+		if (row!=null){
+			double[] temp;
+			for(Entry<Integer, Integer> e: row.entrySet()){
+				int s = e.getKey(), t = e.getValue(); 
+				temp = this.base[s];
+				this.base[s]=this.base[t];
+				this.base[t]=temp;
+			}
+		}
+		if (col!=null) {
+			double temp;
+			for(int i=0;i<this.base.length;++i){
+				double[] r = this.base[i];
+				for(Entry<Integer,Integer> e : col.entrySet()){
+					int s=e.getKey(), t= e.getValue();
+					temp = r[s];
+					r[s] = r[t];
+					r[t] = temp;
+				}
+			}
+		}
+		SparseMatrix<String> var=new SparseMatrix<String>();
+		for (Entry<MatrixIndex,String> i: this.vars.getMap().entrySet()){
+			int r = i.getKey().row;
+			int c = i.getKey().col;
+			Integer t;
+			t = row.get(r);
+			if (t!=null) r=t;
+			t = col.get(c);
+			if (t!=null) c=t;
+			var.put(r, c, i.getValue());
+		}
+		this.vars = var;
+	}
+	
 	public SmartMatrix minor(int r,int c){
 		double[][] par=new double[this.base.length-1][this.base.length-1];
 		SparseMatrix<String> var=new SparseMatrix<String>();
@@ -231,6 +283,14 @@ public class SmartMatrix {
 	}
 	public boolean isSymbolicEntry(int r, int c){
 		return (base[r][c]<0) && vars.getN(r, c)!=null;
+	}
+	public void setEntry(int r, int c, double val){
+		base[r][c]=val;
+		vars.remove(r, c);
+	}
+	public void setEntry(int r, int c, String val){
+		vars.put(r, c, val);
+		base[r][c]=-1;
 	}
 	public String toString(){
 		StringWriter writer = new StringWriter();
