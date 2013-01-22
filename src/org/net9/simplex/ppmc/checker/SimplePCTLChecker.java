@@ -194,16 +194,23 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		if (bs.cardinality()==1) {
 			rc = this.getReachabilityChecker();
 			destState = bs.nextSetBit(0);
+			if (p.parent.isNested) {
+				// TODO : return set solver
+				throw new UnsupportedOperationException();
+			} else {
+				Node exp = rc.check(initState, destState);
+				this.result = new ExpressionSolver(exp);
+			}
 		} else {
-			// TODO: build new model and checker
-			throw new UnsupportedOperationException();
-		}
-		if (p.parent.isNested) {
-			// TODO : return set solver
-			throw new UnsupportedOperationException();
-		} else {
-			Node exp = rc.check(initState, destState);
-			this.result = new ExpressionSolver(exp);
+			if (p.parent.isNested) {
+				// TODO : return set solver
+				throw new UnsupportedOperationException();
+			} else {
+				BitSet bs1 = sTrue.solveSet(null);
+				Node exp = UntilChecker.check(model, bs1, bs, this.initState);
+				this.result = new ExpressionSolver(exp);
+				return;
+			}
 		}
 	}	
 
@@ -275,14 +282,32 @@ public class SimplePCTLChecker implements PropertyVisitor {
 			throw new UnsupportedOperationException();
 		} else {
 			// TODO: build new model and checker
-			throw new UnsupportedOperationException();
+			Node exp = UntilChecker.check(model, bs1, bs2, this.initState);
+			this.result = new ExpressionSolver(exp);
+			return;
 		}
 	}
 
 	@Override
-	public void visit(PropBoundedUntil propBoundedUntil) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	public void visit(PropBoundedUntil p) {
+		p.p1.accept(this);
+		Solver s1 = this.result;
+		p.p2.accept(this);
+		Solver s2 = this.result;
+		if (!s1.isConstant() || !s2.isConstant()){
+			//TODO : run time solver
+			throw new UnsupportedOperationException();
+		}
+		
+		BitSet bs1 = s1.solveSet(null);
+		BitSet bs2 = s2.solveSet(null);
+		if (p.parent.isNested) {
+			// TODO : return set solver
+			throw new UnsupportedOperationException();
+		} else {
+			Node r = BoundedUntilChecker.check(model,p.bound, bs1, bs2, this.initState);
+			this.result = new ExpressionSolver(r);
+		}
 	}
 
 }

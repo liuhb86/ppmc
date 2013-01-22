@@ -5,16 +5,19 @@ import java.util.HashMap;
 
 import org.net9.simplex.ppmc.mat.SmartMatrix;
 
+// TODO : this class architecture is awful.
 public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 
 	HashMap<Integer,Integer> reorderMap = new HashMap<Integer,Integer>();
+	final int sAccept;
+	final int sReject;
 	
 	public ReorderedAbsorbingDTMC(SimpleDTMC model, BitSet accept, BitSet reject) {
 		SmartMatrix sm = model.trans.increaseSize(2, 2);
 		int newSize = sm.getDim();
 		int nTransient = model.numTransients;
-		final int sAccept = model.size();
-		final int sReject = model.size()+1;
+		this.sAccept = model.size();
+		this.sReject = model.size()+1;
 		BitSet union = (BitSet) accept.clone();
 		union.or(reject);
 		for(int k=union.nextSetBit(0);k>=0;k=union.nextSetBit(k+1)){
@@ -43,8 +46,25 @@ public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 			reorderMap.put(j, i);
 		}
 		if (i==j && (accept.get(i) || reject.get(i))) {++nTransient;}
-
-		// TODO: unfinished
+		sm.exchange(reorderMap, reorderMap);
+		
+		this.trans = sm;
+		this.numTransients = nTransient;
+		this.currentState = model.currentState;
+		this.ap = model.ap;
 	}
-
+	
+	public int getState(int index) {
+		Integer r = reorderMap.get(index);
+		if (r==null) return index;
+		return r;
+	}
+	
+	public int getAcceptState() {
+		return this.sAccept;
+	}
+	
+	public int getRejectState() {
+		return this.sReject;
+	}
 }

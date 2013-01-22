@@ -63,7 +63,29 @@ public class JepMatrix {
 				Dimensions.valueOf(m, p));
 		
 	}
-	static Node get(MatrixNodeI m, int row, int col){
+	public static Node get(MatrixNodeI m, int row, int col){
 		return m.jjtGetChild(row*m.getDim().getLastDim()+col);
 	}
+	
+	public static MatrixNodeI valueOf(SmartMatrix m){
+		StringBuffer sb = new StringBuffer();
+		sb.append('[');
+		for(int i=0;i<m.getDimR();++i){
+			if (i!=0) sb.append(',');
+			sb.append('[');
+			for(int j=0;j<m.getDimC();++j){
+				if (j!=0) sb.append(',');
+				sb.append(m.getEntry(i, j));
+			}
+			sb.append(']');
+		}
+		sb.append(']');
+		Node r = null;
+		try {
+			r = jep.parse(sb.toString());
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return (MatrixNodeI) r;
+	} 
 }
