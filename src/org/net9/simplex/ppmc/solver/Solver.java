@@ -1,5 +1,6 @@
 package org.net9.simplex.ppmc.solver;
 
+import java.io.PrintWriter;
 import java.util.BitSet;
 import org.net9.simplex.ppmc.core.Assignment;
 
@@ -12,5 +13,8 @@ public abstract class Solver {
 	}
 	public void setConstant(boolean c){
 		this.isConstant = c;
+	}
+	public void writeTo(PrintWriter writer){
+		writer.println(this.toString());
 	}
 }

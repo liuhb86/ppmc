@@ -1,5 +1,6 @@
 package org.net9.simplex.ppmc.solver.logic;
 
+import java.io.PrintWriter;
 import java.util.BitSet;
 import org.net9.simplex.ppmc.core.Assignment;
 import org.net9.simplex.ppmc.solver.Solver;
@@ -26,5 +27,11 @@ public class NotSolver extends Solver {
 		return bs;
 	}
 
+	@Override
+	public void writeTo(PrintWriter writer){
+		writer.println("NOT {");
+		c1.writeTo(writer);
+		writer.println("}");
+	}
 
 }

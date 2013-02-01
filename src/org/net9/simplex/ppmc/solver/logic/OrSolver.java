@@ -1,5 +1,6 @@
 package org.net9.simplex.ppmc.solver.logic;
 
+import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.LinkedList;
 
@@ -30,5 +31,15 @@ public class OrSolver extends Solver{
 		for (Solver s:item)
 		bs.or(s.solveSet(val));
 		return bs;
+	}
+	
+	@Override
+	public void writeTo(PrintWriter writer){
+		writer.println("OR {");
+		for(Solver s: item){
+			s.writeTo(writer);
+			writer.println(",");
+		}
+		writer.println("}");
 	}
 }

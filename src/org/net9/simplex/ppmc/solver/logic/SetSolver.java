@@ -1,5 +1,6 @@
 package org.net9.simplex.ppmc.solver.logic;
 
+import java.io.PrintWriter;
 import java.util.BitSet;
 
 import org.net9.simplex.ppmc.core.Assignment;
@@ -33,5 +34,11 @@ public class SetSolver extends Solver {
 	@Override
 	public boolean isConstant(){
 		return true;
+	}
+	
+	@Override
+	public void writeTo(PrintWriter writer){
+		writer.print("STATES: ");
+		writer.print(item);
 	}
 }

@@ -49,7 +49,9 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		
 	}
 	
-	public Solver check(StateProperty p){
+	public Solver check(StateProperty p) 
+			throws IllegalArgumentException, 
+				UnsupportedOperationException {
 		initState = model.currentState;
 		isNested = false;
 		p.accept(this);
@@ -64,6 +66,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 	@Override
 	public void visit(PropAtom p) {
 		BitSet ap = model.ap.get(p.atom); 
+		if (ap == null) throw new IllegalArgumentException("No Atom Proposition: "+p.atom);
 		if(!isNested){
 			this.result = this.getConstSolver(ap.get(initState));
 		} else {
@@ -169,7 +172,7 @@ public class SimplePCTLChecker implements PropertyVisitor {
 		this.isNested = true;
 		p.p1.accept(this);
 		ExpressionSolver s = (ExpressionSolver) this.result;
-		s.setConstraints(p.comparator, p.prob);
+		s.setConstraints(p.strComparator, p.comparator, p.prob);
 		if (s.isConstant()){
 			if (s.isSingle()) {
 				this.result = this.getConstSolver(s.solve(null));

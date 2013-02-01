@@ -47,8 +47,16 @@ public class SimplePCTLCheckerTest {
 				System.out.println(e.toString());
 				continue;
 			}
-			Solver solver = checker.check(p);
-			Stdio.out.println(solver.solve(null));
+			try {
+				Solver solver = checker.check(p);
+				solver.writeTo(Stdio.out);
+				Stdio.out.println(solver.solve(null));
+			} catch (IllegalArgumentException e) {
+				System.out.println(e);
+			} catch (UnsupportedOperationException e) {
+				System.out.println("Currently not supported.");
+				System.out.println(e);
+			}
 		}
 	}
 

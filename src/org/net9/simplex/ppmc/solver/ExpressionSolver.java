@@ -1,5 +1,6 @@
 package org.net9.simplex.ppmc.solver;
 
+import java.io.PrintWriter;
 import java.util.BitSet;
 
 import org.lsmp.djep.xjep.NodeFactory;
@@ -16,7 +17,9 @@ public class ExpressionSolver extends Solver implements NumericSolver{
 	boolean isSingle;
 	boolean isConst;
 	BinaryPredicator<Double,Double> pred;
+	String strPred;
 	double value;
+	static XJep jep = new XJep();
 	
 	public ExpressionSolver(Node expr){
 		this.expr = expr;
@@ -74,8 +77,9 @@ public class ExpressionSolver extends Solver implements NumericSolver{
 	}
 
 	@Override
-	public void setConstraints(BinaryPredicator<Double, Double> pred,
+	public void setConstraints(String strPred, BinaryPredicator<Double, Double> pred,
 			double value) {
+		this.strPred = strPred;
 		this.pred = pred;
 		this.value = value;
 	}
@@ -99,7 +103,6 @@ public class ExpressionSolver extends Solver implements NumericSolver{
 		if (expr instanceof ASTConstant){
 			((ASTConstant) expr).setValue(1-Assignment.evaluateConst(expr));
 		} else {
-			XJep jep = new XJep();
 			NodeFactory nf = jep.getNodeFactory();
 			try {
 				expr = nf.buildOperatorNode(
@@ -111,5 +114,15 @@ public class ExpressionSolver extends Solver implements NumericSolver{
 			}
 		}
 		return expr;
+	}
+
+	@Override
+	public void writeTo(PrintWriter writer) {
+		if (this.isSingle){
+			writer.println("Expression: ");
+			writer.println(jep.toString(this.expr));
+			writer.print(this.strPred);
+			writer.println(this.value);
+		}
 	}
 }

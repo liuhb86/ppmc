@@ -15,6 +15,7 @@ import org.nfunk.jep.ParseException;
 public class SimpleReachabilityChecker {
 	SimpleDTMC model;
 	SmartMatrix M=null;
+	Node detM = null;
 	HashMap <MatrixIndex, String> cofactor = new HashMap <MatrixIndex, String>();
 	XJep jep = new XJep();
 	PolynomialCreator simplifier = new PolynomialCreator(jep);
@@ -25,7 +26,14 @@ public class SimpleReachabilityChecker {
 		jep.setAllowAssignment(false);
 	}
 	
-	public SmartMatrix getM(){
+	Node getDetM() {
+		if (this.detM == null){
+			SmartMatrix sm = this.getM();
+			this.detM = this.simplify(sm.determinant());
+		}
+		return this.detM;
+	}
+	SmartMatrix getM(){
 		if(this.M==null){
 			int dim = model.numTransients;
 			SmartMatrix trans = model.trans;
@@ -79,7 +87,9 @@ public class SimpleReachabilityChecker {
 		//assert(to<model.numTransients);
 		String aji = this.getCofactor(to, from);
 		String ajj = this.getCofactor(to, to);
-		return this.simplify("("+aji+")/("+ajj+")");
+		Node nji = simplify(aji);
+		Node njj = simplify(ajj);
+		return jepDivide(nji,njj);
 	}
 	
 	/**
@@ -92,9 +102,6 @@ public class SimpleReachabilityChecker {
 		//assert(from<model.numTransients);
 		//assert(to>=model.numTransients);
 
-		SmartMatrix sm= this.getM();
-		String deta=sm.determinant();
-
 		StringBuffer num = new StringBuffer("0");
 		for(int i=0;i<model.numTransients;i++){	
 			if(model.trans.getNumericEntry(i, to)!=0){
@@ -105,13 +112,23 @@ public class SimpleReachabilityChecker {
 						.append(model.trans.getEntry(i, to, true));
 				}
 			}
-		}	
-		String both="("+num.toString()+")/("+deta+")";
-	
-		Node simpl= simplify(both);
+		}
+		Node numerator = simplify(num.toString());
+		Node d = this.getDetM();
+		Node simpl= jepDivide(numerator,d);
 		return simpl; 
 	}
 	
+	Node jepDivide(Node n1,Node n2){
+		try {
+			Node r = jep.getNodeFactory().buildOperatorNode(
+					jep.getOperatorSet().getDivide(),
+					n1, n2);
+			return simplifier.simplify(r);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
 	String getCofactor(int i, int j) {
 		MatrixIndex index = new MatrixIndex(i,j);
 		String c = cofactor.get(index);

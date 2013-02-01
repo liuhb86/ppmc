@@ -1,5 +1,6 @@
 package org.net9.simplex.ppmc.solver.logic;
 
+import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.LinkedList;
 
@@ -31,5 +32,15 @@ public class AndSolver extends Solver {
 		for (Solver s:item)
 		bs.and(s.solveSet(val));
 		return bs;
+	}
+	
+	@Override
+	public void writeTo(PrintWriter writer){
+		writer.println("AND {");
+		for(Solver s: item){
+			s.writeTo(writer);
+			writer.println(",");
+		}
+		writer.println("}");
 	}
 }

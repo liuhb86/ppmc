@@ -49,39 +49,6 @@ public class SimpleDTMC implements DTMC {
 		this.ap = ap;
 	}
 
-	/* (non-Javadoc)
-	 * @see core.DTMC#isAbsorbed()
-	 */
-	@Override
-	public boolean isAbsorbed() {
-		return (this.currentState>=this.numTransients);
-	}
-
-	/* (non-Javadoc)
-	 * @see core.DTMC#move(double)
-	 */
-	@Override
-	public void move(double dice) {
-		if(this.isAbsorbed()) return;
-		double cum=0.0;
-		for(int a=0;a<trans.getDimC();a++){
-			if(dice<cum+trans.getNumericEntry(currentState, a)){
-				this.currentState=a;
-				break;
-			}
-			cum+=trans.getNumericEntry(currentState, a);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see core.DTMC#reset()
-	 */
-	@Override
-	public void reset() {
-		this.currentState=0;
-	}
-
-	@Override
 	public void loadFile(String path) throws IOException {
 		DataInputStream fIn = new DataInputStream(new FileInputStream(path));
 		char c = fIn.readChar();
@@ -98,7 +65,6 @@ public class SimpleDTMC implements DTMC {
 		fIn.close();
 	}
 
-	@Override
 	public void toFile(String path) throws IOException {
 		DataOutputStream fOut=new DataOutputStream(new FileOutputStream(path));
 		fOut.writeChar('S');
