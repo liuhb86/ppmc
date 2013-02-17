@@ -1,5 +1,7 @@
 package org.net9.simplex.ppmc.core;
 
+import java.io.Reader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -9,23 +11,22 @@ import java.util.Stack;
 import org.lsmp.djep.xjep.XJep;
 import org.net9.simplex.ppmc.mat.SmartMatrix;
 import org.net9.simplex.ppmc.mat.SparseMatrix;
-import org.nfunk.jep.ParseException;
 
 public class GeneralDTMC implements DTMC {
 
-	public SmartMatrix trans;
-	SimpleDTMC absorbingTrans;
-	int[] reorderMap;
-	public BSCC[] bsccMap;
-	public BSCC[] ergoric;
+	SmartMatrix trans;
 	int initialState;
 	HashMap<String, BitSet> ap;
-	
-	
-	public GeneralDTMC(double[][] transitionMatrix, SparseMatrix<String> var,int initial, HashMap<String, BitSet> ap){
+	public SimpleDTMC absorbingTrans;
+	public int[] reorderMap;
+	public BSCC[] bsccMap;
+	public HashSet<BSCC> bsccSet = new HashSet<BSCC>();
+	public BSCC[] ergoric;
+
+	public GeneralDTMC(SmartMatrix trans,int initial, HashMap<String, BitSet> ap){
 		this.initialState = initial;
 		this.ap = ap;
-		this.trans = new SmartMatrix(transitionMatrix, var);
+		this.trans = trans;
 		this.init();
 	}
 	
@@ -53,6 +54,7 @@ recursive:
 				visited[u] = true;
 				label[u]=curLabel;
 				group[u]=curLabel;
+				++curLabel;
 				sStack.push(u);
 				sSet.add(u);
 				v=0;
@@ -83,6 +85,7 @@ recursive:
 					bscc.states.add(v);
 					bsccMap[v]=bscc;
 				} while(u!=v);
+				bsccSet.add(bscc);
 			}
 			stack.pop();
 			varStack.pop();
@@ -142,7 +145,7 @@ recursive:
 					try {
 						sp = jep.toString(jep.simplify(jep.parse(
 								vars.get(s, t)+"+"+transition[s][t])));
-					} catch (ParseException e) {
+					} catch (org.nfunk.jep.ParseException e) {
 						e.printStackTrace();
 					}
 					vars.put(s, t, sp);
@@ -172,7 +175,7 @@ recursive:
 			}
 		}
 
-		this.ergoric = (BSCC[]) ergoric.toArray();
+		this.ergoric = (BSCC[]) ergoric.toArray(new BSCC[ergoric.size()]);
 		for(int i=0;i<this.ergoric.length;++i) {
 			this.ergoric[i].index = i;
 		}
@@ -182,6 +185,26 @@ recursive:
 	@Override
 	public int size() {
 		return trans.getDim();
+	}
+	
+	public static GeneralDTMC loadFrom(Reader in) throws ParseException{
+		SimpleDTMC dtmc = SimpleDTMC.loadFrom(in);
+		return new GeneralDTMC(dtmc.trans, dtmc.currentState, dtmc.ap);
+	}
+
+	@Override
+	public SmartMatrix getTrans() {
+		return this.trans;
+	}
+
+	@Override
+	public int getInitState() {
+		return this.initialState;
+	}
+
+	@Override
+	public HashMap<String, BitSet> getAP() {
+		return this.ap;
 	}
 
 }

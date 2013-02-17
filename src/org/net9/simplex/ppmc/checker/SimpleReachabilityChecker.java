@@ -36,7 +36,7 @@ public class SimpleReachabilityChecker {
 	SmartMatrix getM(){
 		if(this.M==null){
 			int dim = model.numTransients;
-			SmartMatrix trans = model.trans;
+			SmartMatrix trans = model.getTrans();
 			double smd[][]=new double[dim][dim];
 			SparseMatrix<String> vars = trans.getVars().clone();
 			for(int i=0;i<dim;i++){
@@ -104,12 +104,12 @@ public class SimpleReachabilityChecker {
 
 		StringBuffer num = new StringBuffer("0");
 		for(int i=0;i<model.numTransients;i++){	
-			if(model.trans.getNumericEntry(i, to)!=0){
+			if(model.getTrans().getNumericEntry(i, to)!=0){
 				String n = this.getCofactor(i, from);
 				if (!n.equals("0")) {
 					char coef=(from+i)%2==0?'+':'-';
 					num.append(coef).append('(').append(n).append(")*")
-						.append(model.trans.getEntry(i, to, true));
+						.append(model.getTrans().getEntry(i, to, true));
 				}
 			}
 		}

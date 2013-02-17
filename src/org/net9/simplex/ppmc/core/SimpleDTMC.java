@@ -27,10 +27,10 @@ import org.net9.simplex.ppmc.mat.SparseMatrix;
  * @author Antonio Filieri 
  */
 public class SimpleDTMC implements DTMC {
-	public SmartMatrix trans;
-	public int currentState;
+	SmartMatrix trans;
+	int currentState;
 	public int numTransients;
-	public HashMap<String, BitSet> ap;
+	HashMap<String, BitSet> ap;
 
 	SimpleDTMC(){	
 	}
@@ -188,5 +188,18 @@ public class SimpleDTMC implements DTMC {
 	
 	public int size() {
 		return trans.getDim();
+	}
+	
+	@Override
+	public SmartMatrix getTrans() {
+		return this.trans;
+	}
+	@Override
+	public int getInitState() {
+		return this.currentState;
+	}
+	@Override
+	public HashMap<String, BitSet> getAP() {
+		return this.ap;
 	}
 }

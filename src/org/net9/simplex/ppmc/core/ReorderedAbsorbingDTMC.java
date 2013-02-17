@@ -11,11 +11,11 @@ public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 	HashMap<Integer,Integer> reorderMap = new HashMap<Integer,Integer>();
 	final int sAccept;
 	final int sReject;
+	public boolean isAbsorbing;
 	
-	public ReorderedAbsorbingDTMC(SimpleDTMC model, BitSet accept, BitSet reject) {
-		SmartMatrix sm = model.trans.increaseSize(2, 2);
+	public ReorderedAbsorbingDTMC(DTMC model, BitSet accept, BitSet reject, boolean reorder) {
+		SmartMatrix sm = model.getTrans().increaseSize(2, 2);
 		int newSize = sm.getDim();
-		int nTransient = model.numTransients;
 		this.sAccept = model.size();
 		this.sReject = model.size()+1;
 		BitSet union = (BitSet) accept.clone();
@@ -28,6 +28,23 @@ public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 			else
 				sm.setEntry(k, sReject, 1);
 		}
+		this.trans = sm;
+		this.numTransients = 2;
+		this.currentState = model.getInitState();
+		this.ap = model.getAP();
+		if (reorder){
+			this.reorder((SimpleDTMC) model, accept, reject);
+		} else {
+			this.isAbsorbing = false;
+		}
+	}
+	public ReorderedAbsorbingDTMC(SimpleDTMC model, BitSet accept, BitSet reject) {
+		this(model,accept,reject,true);
+	}
+	
+	void reorder(SimpleDTMC model, BitSet accept, BitSet reject){
+		int nTransient = model.numTransients;
+		
 		int i= model.numTransients;
 		int j= model.size()-1;
 
@@ -46,12 +63,8 @@ public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 			reorderMap.put(j, i);
 		}
 		if (i==j && (accept.get(i) || reject.get(i))) {++nTransient;}
-		sm.exchange(reorderMap, reorderMap);
-		
-		this.trans = sm;
+		this.trans.exchange(reorderMap, reorderMap);
 		this.numTransients = nTransient;
-		this.currentState = model.currentState;
-		this.ap = model.ap;
 	}
 	
 	public int getState(int index) {
