@@ -49,15 +49,11 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 		}
 		BitSet bs = s.solveSet(null);
 		
-		if (bs.isEmpty()){
-			this.result = this.getConstSolver(false);
+		if (p.parent.isNested) {
+			// TODO : return set solver
+			throw new UnsupportedOperationException();
 		} else {
-			if (p.parent.isNested) {
-				// TODO : return set solver
-				throw new UnsupportedOperationException();
-			} else {
-				this.result = solveEventually(this.initState, bs);
-			}
+			this.result = solveEventually(this.initState, bs);
 		}
 	}	
 
@@ -101,7 +97,6 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 			// TODO : return set solver
 			throw new UnsupportedOperationException();
 		} else {
-			// TODO: build new model and checker
 			Node exp = UntilChecker.check(specificModel, bs1, bs2, this.initState);
 			this.result = new ExpressionSolver(exp);
 			return;

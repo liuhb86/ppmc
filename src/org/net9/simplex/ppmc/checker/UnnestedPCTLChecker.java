@@ -3,11 +3,9 @@ package org.net9.simplex.ppmc.checker;
 import java.util.BitSet;
 
 import org.net9.simplex.ppmc.core.GeneralDTMC;
-import org.net9.simplex.ppmc.core.SimpleDTMC;
+import org.net9.simplex.ppmc.core.ReorderedAbsorbingDTMC;
 import org.net9.simplex.ppmc.prop.*;
-import org.net9.simplex.ppmc.solver.ExpressionSolver;
 import org.net9.simplex.ppmc.solver.Solver;
-import org.nfunk.jep.Node;
 
 public class UnnestedPCTLChecker extends BasePCTLChecker {
 
@@ -21,7 +19,19 @@ public class UnnestedPCTLChecker extends BasePCTLChecker {
 		this.absorbingChecker = new SimplePCTLChecker(model.absorbingTrans);
 	}
 	
-
+	public Solver solveEventually(int from, BitSet to) {
+		BitSet bs = new BitSet(specificModel.absorbingTrans.size());
+		for(int i=to.nextSetBit(0);i>=0;i=to.nextSetBit(i+1)){
+			bs.set(specificModel.reorderMap[i]);
+		}
+		if (bs.isEmpty()){
+			return this.getConstSolver(false);
+		} else {
+			return fromAbsorbingChecker(
+				absorbingChecker.solveEventually(from, bs));
+		}
+	}
+	
 	@Override
 	public void visit(PropEventually p) {
 		p.p1.accept(this);
@@ -31,21 +41,12 @@ public class UnnestedPCTLChecker extends BasePCTLChecker {
 			throw new UnsupportedOperationException();
 		}
 		BitSet pbs = s.solveSet(null);
-		BitSet bs = new BitSet(specificModel.absorbingTrans.size());
-		for(int i=pbs.nextSetBit(0);i>=0;i=pbs.nextSetBit(i+1)){
-			bs.set(specificModel.reorderMap[i]);
-		}
 		
-		if (bs.isEmpty()){
-			this.result = this.getConstSolver(false);
+		if (p.parent.isNested) {
+			// TODO : return set solver
+			throw new UnsupportedOperationException();
 		} else {
-			if (p.parent.isNested) {
-				// TODO : return set solver
-				throw new UnsupportedOperationException();
-			} else {
-				this.result = fromAbsorbingChecker(
-						absorbingChecker.solveEventually(this.initState, bs));
-			}
+			this.result = solveEventually(this.initState, pbs);
 		}
 		
 	}
@@ -97,11 +98,14 @@ public class UnnestedPCTLChecker extends BasePCTLChecker {
 			// TODO : return set solver
 			throw new UnsupportedOperationException();
 		} else {
-			// TODO: build new model and checker
-			Node exp = UntilChecker.check(specificModel, bs1, bs2, this.initState);
-			this.result = new ExpressionSolver(exp);
-			return;
+			BitSet bsEmpty = new BitSet(model.size());
+			bs.flip(0, model.size());
+			ReorderedAbsorbingDTMC filteredDTMC = 
+					new ReorderedAbsorbingDTMC(model, bsEmpty, bs, false);
+			GeneralDTMC dtmc = 
+					new GeneralDTMC(filteredDTMC.getTrans(),filteredDTMC.getInitState(),filteredDTMC.getAP());
+			UnnestedPCTLChecker checker = new UnnestedPCTLChecker(dtmc);
+			this.result = checker.solveEventually(dtmc.getInitState(), bs2);
 		}
-	}
 	}
 }

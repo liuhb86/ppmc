@@ -1,10 +1,7 @@
 package org.net9.simplex.ppmc.core;
 
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -16,8 +13,6 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-import java.io.DataOutputStream;
-
 import org.net9.simplex.ppmc.mat.SmartMatrix;
 import org.net9.simplex.ppmc.mat.SparseMatrix;
 
@@ -47,36 +42,6 @@ public class SimpleDTMC implements DTMC {
 		this.numTransients=numTransients;
 		this.trans = new SmartMatrix(transitionMatrix,var);
 		this.ap = ap;
-	}
-
-	public void loadFile(String path) throws IOException {
-		DataInputStream fIn = new DataInputStream(new FileInputStream(path));
-		char c = fIn.readChar();
-		if(c!='S') throw new IOException(path+" does not contain a SimpleDTMC");
-		this.currentState=fIn.readInt();
-		this.numTransients=fIn.readInt();
-		int size=fIn.readInt();
-		this.trans = new SmartMatrix(new double[size][size]);
-		for(int i=0;i<size;i++){
-			for(int j=0;j<size;j++){
-				trans.getBase()[i][j]=fIn.readDouble();
-			}
-		}
-		fIn.close();
-	}
-
-	public void toFile(String path) throws IOException {
-		DataOutputStream fOut=new DataOutputStream(new FileOutputStream(path));
-		fOut.writeChar('S');
-		fOut.writeInt(this.currentState);
-		fOut.writeInt(this.numTransients);
-		fOut.writeInt(trans.getDim());
-		for(int i=0;i<trans.getDimR();i++){
-			for(int j=0;j<trans.getDimC();j++){
-				fOut.writeDouble(trans.getNumericEntry(i, j));
-			}
-		}
-		fOut.close();	
 	}
 	
 	public static SimpleDTMC loadFrom(Reader in) throws ParseException{

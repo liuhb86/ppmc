@@ -16,7 +16,6 @@ Export-Package:
    org.lsmp.djep.xjep,
    org.net9.simplex.ppmc.solver",
  org.net9.simplex.ppmc.core;uses:="org.net9.simplex.ppmc.mat",
- org.net9.simplex.ppmc.gen;uses:="org.net9.simplex.ppmc.util,org.net9.simplex.ppmc.core",
  org.net9.simplex.ppmc.mat,
  org.net9.simplex.ppmc.prop,
  org.net9.simplex.ppmc.solver,
