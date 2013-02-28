@@ -18,8 +18,25 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 	
 	SimpleReachabilityChecker getReachabilityChecker(){
 		if (this.reachChecker==null)
-			this.reachChecker = new SimpleReachabilityChecker((SimpleDTMC) model);
+			this.reachChecker = new SimpleReachabilityChecker(specificModel);
 		return this.reachChecker;
+	}
+	
+	public Solver solveEventually(int from, BitSet to) {
+		SimpleReachabilityChecker rc;
+		int destState;
+		if (to.isEmpty()){
+			return this.getConstSolver(false);
+		} else if (to.cardinality()==1) {
+			rc = this.getReachabilityChecker();
+			destState = to.nextSetBit(0);
+			Node exp = rc.check(from, destState);
+			return new ExpressionSolver(exp);
+		} else {
+			BitSet bs1 = this.getConstSolver(true).solveSet(null);
+			Node exp = UntilChecker.check(specificModel, bs1, to, from);
+			return new ExpressionSolver(exp);
+		}
 	}
 	
 	@Override
@@ -31,27 +48,15 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 			throw new UnsupportedOperationException();
 		}
 		BitSet bs = s.solveSet(null);
-		SimpleReachabilityChecker rc;
-		int destState;
-		if (bs.cardinality()==1) {
-			rc = this.getReachabilityChecker();
-			destState = bs.nextSetBit(0);
-			if (p.parent.isNested) {
-				// TODO : return set solver
-				throw new UnsupportedOperationException();
-			} else {
-				Node exp = rc.check(initState, destState);
-				this.result = new ExpressionSolver(exp);
-			}
+		
+		if (bs.isEmpty()){
+			this.result = this.getConstSolver(false);
 		} else {
 			if (p.parent.isNested) {
 				// TODO : return set solver
 				throw new UnsupportedOperationException();
 			} else {
-				BitSet bs1 = this.getConstSolver(true).solveSet(null);
-				Node exp = UntilChecker.check((SimpleDTMC) model, bs1, bs, this.initState);
-				this.result = new ExpressionSolver(exp);
-				return;
+				this.result = solveEventually(this.initState, bs);
 			}
 		}
 	}	
@@ -97,7 +102,7 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 			throw new UnsupportedOperationException();
 		} else {
 			// TODO: build new model and checker
-			Node exp = UntilChecker.check((SimpleDTMC) model, bs1, bs2, this.initState);
+			Node exp = UntilChecker.check(specificModel, bs1, bs2, this.initState);
 			this.result = new ExpressionSolver(exp);
 			return;
 		}
