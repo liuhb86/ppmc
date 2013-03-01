@@ -128,7 +128,7 @@ public class SimpleDTMC implements DTMC {
 			}
 			printer.println();
 		}
-		printer.close();
+		//printer.close();
 	}
 	
 	public void toTransTable(OutputStream os) {

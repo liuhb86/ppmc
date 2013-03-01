@@ -1,12 +1,15 @@
 package org.net9.simplex.ppmc.core;
 
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 import org.lsmp.djep.xjep.XJep;
 import org.net9.simplex.ppmc.mat.SmartMatrix;
@@ -191,6 +194,29 @@ recursive:
 		SimpleDTMC dtmc = SimpleDTMC.loadFrom(in);
 		return new GeneralDTMC(dtmc.trans, dtmc.currentState, dtmc.ap);
 	}
+	
+	@Override
+	public void writeTo(Writer writer) {
+		PrintWriter printer = new PrintWriter(writer);
+		printer.println("[Model]");
+		printer.print("size = ");
+		printer.println(this.size());
+		printer.print("init = ");
+		printer.println(this.getInitState());
+		printer.println("[Transition]");
+		trans.writeTo(printer);
+		printer.println("[AP]");
+		for (Entry<String, BitSet> e : ap.entrySet()){
+			printer.print(e.getKey());
+			printer.print(" = ");
+			BitSet bs = e.getValue();
+			for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
+			     printer.print(' ');
+			     printer.print(i);
+			}
+			printer.println();
+		}
+	}
 
 	@Override
 	public SmartMatrix getTrans() {
@@ -206,5 +232,7 @@ recursive:
 	public HashMap<String, BitSet> getAP() {
 		return this.ap;
 	}
+
+
 
 }

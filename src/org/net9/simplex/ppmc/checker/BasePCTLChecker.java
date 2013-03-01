@@ -191,6 +191,7 @@ public abstract class BasePCTLChecker implements ModelChecker {
 	public void visit(PropAlways p) {
 		PropEventually eventually = 
 				new PropEventually(new PropNot(p.p1));
+		eventually.parent = p.parent;
 		eventually.accept(this);
 		((NumericSolver) this.result).complement();
 	}
