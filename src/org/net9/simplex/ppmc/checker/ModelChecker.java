@@ -6,5 +6,4 @@ import org.net9.simplex.ppmc.solver.Solver;
 
 public interface ModelChecker extends PropertyVisitor{
 	public Solver check(StateProperty p);
-	public Solver getResult();
 }

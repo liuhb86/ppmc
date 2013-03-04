@@ -6,8 +6,8 @@ public class PropAlways extends PathProperty {
 		this.p1 = p1;
 	}
 	@Override
-	public void accept(PropertyVisitor visitor) {
-		visitor.visit(this);
+	public Object accept(PropertyVisitor visitor) {
+		return visitor.visit(this);
 	}
 
 }

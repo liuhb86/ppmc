@@ -1,16 +1,18 @@
 package org.net9.simplex.ppmc.prop;
 
 public interface PropertyVisitor {
-	void visit(PropTrue p);
-	void visit(PropAtom p);
-	void visit(PropNot p);
-	void visit(PropAnd p);
-	void visit(PropOr p);
-	void visit(PropSet p);
-	void visit(PropProb p);
-	void visit(PropEventually p);
-	void visit(PropAlways p);
-	void visit(PropNext p);
-	void visit(PropUntil p);
-	void visit(PropBoundedUntil p);
+	Object visit(PropTrue p);
+	Object visit(PropAtom p);
+	Object visit(PropNot p);
+	Object visit(PropAnd p);
+	Object visit(PropOr p);
+	Object visit(PropSet p);
+	Object visit(PropProb p);
+	Object visit(PropEventually p);
+	Object visit(PropAlways p);
+	Object visit(PropNext p);
+	Object visit(PropUntil p);
+	Object visit(PropBoundedUntil p);
+	Object visit(PropLTLPathWrapper p);
+	Object visit(PropLTL p);
 }

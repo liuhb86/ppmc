@@ -40,9 +40,9 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 	}
 	
 	@Override
-	public void visit(PropEventually p) {
-		p.p1.accept(this);
-		Solver s = this.result;
+	public Object visit(PropEventually p) {
+		
+		Solver s = s(p.p1.accept(this));
 		if (!s.isConstant()){
 			//TODO : run time solver
 			throw new UnsupportedOperationException();
@@ -53,14 +53,14 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 			// TODO : return set solver
 			throw new UnsupportedOperationException();
 		} else {
-			this.result = solveEventually(this.initState, bs);
+			return solveEventually(this.initState, bs);
 		}
 	}	
 
 	@Override
-	public void visit(PropUntil p) {
-		p.p1.accept(this);
-		Solver s1 = this.result;
+	public Object visit(PropUntil p) {
+		
+		Solver s1 = s(p.p1.accept(this));
 		if (!s1.isConstant()){
 			//TODO : run time solver
 			throw new UnsupportedOperationException();
@@ -69,12 +69,10 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 		if (bs1.cardinality() == model.size()){
 			PropEventually eventually = 
 					new PropEventually(p.p2);
-			eventually.accept(this);
-			return;
+			return eventually.accept(this);
 		}
-		
-		p.p2.accept(this);
-		Solver s2 = this.result;
+				
+		Solver s2 = s(p.p2.accept(this));
 		if (!s2.isConstant()){
 			//TODO : run time solver
 			throw new UnsupportedOperationException();
@@ -84,13 +82,11 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 		bs.or(bs2);
 		
 		if (bs.isEmpty()){
-			this.result = this.getConstSolver(false);
-			return;
+			return this.getConstSolver(false);
 		} else if (bs.cardinality() == bs.size()){
 			PropEventually eventually = 
 					new PropEventually(p.p2);
-			eventually.accept(this);
-			return;
+			return eventually.accept(this);		
 		}
 		
 		if (p.parent.isNested) {
@@ -98,8 +94,7 @@ public class SimplePCTLChecker extends BasePCTLChecker {
 			throw new UnsupportedOperationException();
 		} else {
 			Node exp = UntilChecker.check(specificModel, bs1, bs2, this.initState);
-			this.result = new ExpressionSolver(exp);
-			return;
+			return new ExpressionSolver(exp);
 		}
 	}
 }

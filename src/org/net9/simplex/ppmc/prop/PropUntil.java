@@ -8,8 +8,8 @@ public class PropUntil extends PathProperty {
 	}
 
 	@Override
-	public void accept(PropertyVisitor visitor) {
-		visitor.visit(this);
+	public Object accept(PropertyVisitor visitor) {
+		return visitor.visit(this);
 	}
 
 }

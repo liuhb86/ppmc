@@ -5,5 +5,5 @@ public abstract class PathProperty {
 	public void print(){
 		System.out.println(this.getClass().toString());
 	}
-	public abstract void accept(PropertyVisitor visitor);
+	public abstract Object accept(PropertyVisitor visitor);
 }

@@ -18,7 +18,7 @@ public class PropOr extends StateProperty {
 		System.out.println("}");
 	}
 	@Override
-	public void accept(PropertyVisitor visitor) {
-		visitor.visit(this);
+	public Object accept(PropertyVisitor visitor) {
+		return visitor.visit(this);
 	}
 }
