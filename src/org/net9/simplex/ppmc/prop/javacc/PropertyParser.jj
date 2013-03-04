@@ -67,11 +67,11 @@ StateProperty stateElement() :
   "(" [< DELIM >]
   p = stateFormula()
   [< DELIM >] ")"
-  { return p; }
+  { return p; }| < NOT > [<DELIM >] p = stateFormula()  {    return new PropNot(p);  } 
 | < TRUE >
   {
     return new PropTrue();
-  }
+  }| < FALSE >	{  		return new PropNot(new PropTrue());	}
 | t = < IDENT >
   {
 	return new PropAtom(t.image);
