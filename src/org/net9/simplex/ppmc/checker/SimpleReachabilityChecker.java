@@ -1,7 +1,6 @@
 package org.net9.simplex.ppmc.checker;
 
 import java.util.HashMap;
-
 import org.lsmp.djep.sjep.PolynomialCreator;
 import org.lsmp.djep.xjep.XJep;
 import org.net9.simplex.ppmc.core.SimpleDTMC;
@@ -38,7 +37,7 @@ public class SimpleReachabilityChecker {
 			int dim = model.numTransients;
 			SmartMatrix trans = model.getTrans();
 			double smd[][]=new double[dim][dim];
-			SparseMatrix<String> vars = trans.getVars().clone();
+			SparseMatrix<String> vars = new SparseMatrix<String>();
 			for(int i=0;i<dim;i++){
 				for(int j=0;j<dim;j++){
 					if (trans.isSymbolicEntry(i, j)) {
@@ -135,6 +134,9 @@ public class SimpleReachabilityChecker {
 		if (c==null) {
 			SmartMatrix mino=this.getM().minor(i, j);
 			c = mino.determinant();
+			if ((i+j)%2==1) {
+				c="-("+c+")";
+			}
 			cofactor.put(index, c);
 		}
 		return c;
