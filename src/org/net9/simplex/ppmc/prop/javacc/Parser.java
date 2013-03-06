@@ -137,7 +137,7 @@ public class Parser implements ParserConstants {
   StateProperty p;
   PathProperty path;
   Token t;
-    if (jj_2_4(3)) {
+    if (jj_2_5(3)) {
       jj_consume_token(18);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DELIM:
@@ -286,16 +286,45 @@ public class Parser implements ParserConstants {
           jj_la1[17] = jj_gen;
           ;
         }
-        path = pathFormula();
+        if (jj_2_4(3)) {
+          p = stateFormula();
+        } else {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case NOT:
+          case TRUE:
+          case FALSE:
+          case PROB:
+          case NEXT:
+          case EVENTUALLY:
+          case ALWAYS:
+          case IDENT:
+          case 18:
+          case 20:
+            path = pathFormulaBinary();
+      p = new PropLTLPathWrapper(path);
+            break;
+          default:
+            jj_la1[18] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
+        }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case DELIM:
           jj_consume_token(DELIM);
           break;
         default:
-          jj_la1[18] = jj_gen;
+          jj_la1[19] = jj_gen;
           ;
         }
         jj_consume_token(19);
+    try
+    {
+      path = new PostProcessor().getPathFormula(p);
+    } catch (java.text.ParseException e)
+    {
+      {if (true) throw new ParseException(e.getMessage());}
+    }
     {if (true) return new PropProb(path, comparator, prob);}
         break;
       case NEXT:
@@ -304,35 +333,6 @@ public class Parser implements ParserConstants {
       case 18:
         path = pathElement();
     {if (true) return new PropLTLPathWrapper(path);}
-        break;
-      default:
-        jj_la1[19] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-    throw new Error("Missing return statement in function");
-  }
-
-  final public PathProperty pathFormula() throws ParseException {
-  PathProperty p;
-    if (jj_2_5(3)) {
-      p = pathFormulaUnary();
-    {if (true) return p;}
-    } else {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case NOT:
-      case TRUE:
-      case FALSE:
-      case PROB:
-      case NEXT:
-      case EVENTUALLY:
-      case ALWAYS:
-      case IDENT:
-      case 18:
-      case 20:
-        p = pathFormulaBinary();
-    {if (true) return p;}
         break;
       default:
         jj_la1[20] = jj_gen;
@@ -530,32 +530,43 @@ public class Parser implements ParserConstants {
     finally { jj_save(4, xla); }
   }
 
-  private boolean jj_3R_13() {
+  private boolean jj_3R_12() {
     if (jj_scan_token(PROB)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(2)) jj_scanpos = xsp;
     if (jj_scan_token(COMP)) return true;
+    xsp = jj_scanpos;
+    if (jj_scan_token(2)) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(16)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(15)) return true;
+    }
     return false;
   }
 
-  private boolean jj_3R_19() {
-    if (jj_3R_7()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_18() {
+  private boolean jj_3R_14() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_19()) {
+    if (jj_3R_15()) {
     jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
+    if (jj_3R_16()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
   private boolean jj_3R_21() {
     if (jj_3R_5()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(2)) jj_scanpos = xsp;
+    if (jj_scan_token(UNTIL)) return true;
     return false;
   }
 
@@ -581,6 +592,11 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+  private boolean jj_3R_13() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
   private boolean jj_3R_4() {
     if (jj_3R_5()) return true;
     Token xsp;
@@ -591,21 +607,23 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_12() {
+  private boolean jj_3R_11() {
     if (jj_scan_token(20)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(2)) jj_scanpos = xsp;
     if (jj_scan_token(INTEGER)) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_3()) { jj_scanpos = xsp; break; }
+    }
+    xsp = jj_scanpos;
+    if (jj_scan_token(2)) jj_scanpos = xsp;
+    if (jj_scan_token(22)) return true;
     return false;
   }
 
-  private boolean jj_3_5() {
-    if (jj_3R_7()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_17() {
+  private boolean jj_3R_20() {
     if (jj_scan_token(NEXT)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -614,12 +632,17 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_11() {
+  private boolean jj_3R_10() {
     if (jj_scan_token(IDENT)) return true;
     return false;
   }
 
-  private boolean jj_3R_16() {
+  private boolean jj_3R_9() {
+    if (jj_scan_token(FALSE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
     if (jj_scan_token(ALWAYS)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -628,35 +651,17 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_10() {
-    if (jj_scan_token(FALSE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_14() {
-    if (jj_3R_18()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_9() {
+  private boolean jj_3R_8() {
     if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
-  private boolean jj_3R_7() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_15()) {
-    jj_scanpos = xsp;
-    if (jj_3R_16()) {
-    jj_scanpos = xsp;
-    if (jj_3R_17()) return true;
-    }
-    }
+  private boolean jj_3_4() {
+    if (jj_3R_6()) return true;
     return false;
   }
 
-  private boolean jj_3R_15() {
+  private boolean jj_3R_18() {
     if (jj_scan_token(EVENTUALLY)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -665,7 +670,20 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_8() {
+  private boolean jj_3R_17() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_18()) {
+    jj_scanpos = xsp;
+    if (jj_3R_19()) {
+    jj_scanpos = xsp;
+    if (jj_3R_20()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_7() {
     if (jj_scan_token(NOT)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -688,7 +706,9 @@ public class Parser implements ParserConstants {
   private boolean jj_3R_5() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_4()) {
+    if (jj_3_5()) {
+    jj_scanpos = xsp;
+    if (jj_3R_7()) {
     jj_scanpos = xsp;
     if (jj_3R_8()) {
     jj_scanpos = xsp;
@@ -700,9 +720,7 @@ public class Parser implements ParserConstants {
     jj_scanpos = xsp;
     if (jj_3R_12()) {
     jj_scanpos = xsp;
-    if (jj_3R_13()) {
-    jj_scanpos = xsp;
-    if (jj_3R_14()) return true;
+    if (jj_3R_13()) return true;
     }
     }
     }
@@ -713,7 +731,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3_4() {
+  private boolean jj_3_5() {
     if (jj_scan_token(18)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -735,7 +753,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_20() {
+  private boolean jj_3R_16() {
     if (jj_scan_token(18)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -761,7 +779,7 @@ public class Parser implements ParserConstants {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x18000,0x4,0x4,0x4,0x160fc8,0x160fc8,0x4,0x4,0x40e00,0x4,0x4,0x4,0xe00,0x4,0x4,0x4,0x4,0x2000,};
+      jj_la1_0 = new int[] {0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x18000,0x4,0x4,0x160fc8,0x4,0x160fc8,0x4,0x4,0x40e00,0x4,0x4,0x4,0xe00,0x4,0x4,0x4,0x4,0x2000,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[5];
   private boolean jj_rescan = false;
