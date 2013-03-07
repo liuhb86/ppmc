@@ -2,6 +2,8 @@ package org.net9.simplex.ppmc.ltl;
 
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.net9.simplex.ppmc.prop.*;
 import org.prismmodelchecker.jltl2ba.APSet;
@@ -10,7 +12,9 @@ import org.prismmodelchecker.jltl2ba.SimpleLTL;
 public class SimpleLTLConverter implements PropertyVisitor {
 
 	APSet apSet;
-	HashMap<String, BitSet> apMap;
+	Map<String, BitSet > apMap;
+	Map<String, StateProperty> subFormulaMap;
+	
 	int label;
 	public static final String SET_LABEL_PREFIX ="{}";
 	
@@ -18,6 +22,7 @@ public class SimpleLTLConverter implements PropertyVisitor {
 		label = 0;
 		apSet = new APSet();
 		apMap = new HashMap<String, BitSet>();
+		subFormulaMap = new TreeMap<String, StateProperty> ();
 		return p(prop.p1.accept(this));
 	}
 	
@@ -25,8 +30,12 @@ public class SimpleLTLConverter implements PropertyVisitor {
 		return this.apSet;
 	}
 	
-	public HashMap<String, BitSet> getAPMap() {
-		return this.getAPMap();
+	public Map<String, BitSet> getAPMap() {
+		return this.apMap;
+	}
+	
+	public Map<String, StateProperty> getSubFormula() {
+		return this.subFormulaMap;
 	}
 	
 	SimpleLTL p(Object o) {
@@ -41,9 +50,11 @@ public class SimpleLTLConverter implements PropertyVisitor {
 	@Override
 	public Object visit(PropAtom p) {
 		String ap = p.atom;
-		if (apMap.containsKey(p))
-		apSet.
-		return null;
+		if (!apMap.containsKey(p)) {
+			apMap.put(ap, null);
+			apSet.addAP(ap);
+		}
+		return new SimpleLTL(ap);
 	}
 
 	@Override
@@ -75,14 +86,21 @@ public class SimpleLTLConverter implements PropertyVisitor {
 
 	@Override
 	public Object visit(PropSet p) {
-		// TODO Auto-generated method stub
-		return null;
+		String ap = SET_LABEL_PREFIX + label;
+		++label;
+		apSet.addAP(ap);
+		apMap.put(ap, p.item);
+		return new SimpleLTL(ap);
 	}
 
 	@Override
 	public Object visit(PropProb p) {
-		// TODO Auto-generated method stub
-		return null;
+		String ap = SET_LABEL_PREFIX + label;
+		++label;
+		apSet.addAP(ap);
+		apMap.put(ap, null);
+		subFormulaMap.put(ap, p);
+		return new SimpleLTL(ap);
 	}
 
 	@Override

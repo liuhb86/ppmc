@@ -1,13 +1,13 @@
 package org.net9.simplex.ppmc.prop;
 
-import java.util.HashSet;
+import java.util.BitSet;
 
 public class PropSet extends StateProperty {
-	public HashSet<Integer> item = new HashSet<Integer>();
+	public BitSet item = new BitSet();
 	
 	public void print(){
 		System.out.print("STATE {");
-		for (int i :item){
+		for (int i=item.nextSetBit(0);i>=0;i=item.nextSetBit(i+1)){
 			System.out.print(i);
 			System.out.print(" ,");
 		}

@@ -47,4 +47,13 @@ public class PropProb extends StateProperty {
 			}
 		});
 	}
+	public void print(){
+		System.out.print("PROB ");
+		System.out.print(strComparator);
+		System.out.print(" ");
+		System.out.print(prob);
+		System.out.println(" {");
+		p1.print();
+		System.out.println("}");
+	}
 }

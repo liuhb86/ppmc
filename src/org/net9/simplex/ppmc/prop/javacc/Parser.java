@@ -96,7 +96,7 @@ public class Parser implements ParserConstants {
   final public StateProperty stateTerm() throws ParseException {
   StateProperty p1,p2;
   PropAnd p = null;
-    p1 = stateElement();
+    p1 = pathTerm();
     label_2:
     while (true) {
       if (jj_2_2(2)) {
@@ -121,7 +121,7 @@ public class Parser implements ParserConstants {
         jj_la1[5] = jj_gen;
         ;
       }
-      p2 = stateElement();
+      p2 = pathTerm();
         if (p==null) {
                 p = new PropAnd(p1,p2);
                 p1 = p;
@@ -137,7 +137,8 @@ public class Parser implements ParserConstants {
   StateProperty p;
   PathProperty path;
   Token t;
-    if (jj_2_5(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 18:
       jj_consume_token(18);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DELIM:
@@ -158,166 +159,143 @@ public class Parser implements ParserConstants {
       }
       jj_consume_token(19);
     {if (true) return p;}
-    } else {
+      break;
+    case NOT:
+      jj_consume_token(NOT);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case NOT:
-        jj_consume_token(NOT);
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+        ;
+      }
+      p = stateFormula();
+    {if (true) return new PropNot(p);}
+      break;
+    case TRUE:
+      jj_consume_token(TRUE);
+    {if (true) return new PropTrue();}
+      break;
+    case FALSE:
+      jj_consume_token(FALSE);
+                {if (true) return new PropNot(new PropTrue());}
+      break;
+    case IDENT:
+      t = jj_consume_token(IDENT);
+        {if (true) return new PropAtom(t.image);}
+      break;
+    case 20:
+      jj_consume_token(20);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[9] = jj_gen;
+        ;
+      }
+      t = jj_consume_token(INTEGER);
+    PropSet ps = new PropSet();
+    ps.item.set(Integer.parseInt(t.image));
+      label_3:
+      while (true) {
+        if (jj_2_3(2)) {
+          ;
+        } else {
+          break label_3;
+        }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case DELIM:
           jj_consume_token(DELIM);
           break;
         default:
-          jj_la1[8] = jj_gen;
+          jj_la1[10] = jj_gen;
           ;
         }
-        p = stateFormula();
-    {if (true) return new PropNot(p);}
-        break;
-      case TRUE:
-        jj_consume_token(TRUE);
-    {if (true) return new PropTrue();}
-        break;
-      case FALSE:
-        jj_consume_token(FALSE);
-                {if (true) return new PropNot(new PropTrue());}
-        break;
-      case IDENT:
-        t = jj_consume_token(IDENT);
-        {if (true) return new PropAtom(t.image);}
-        break;
-      case 20:
-        jj_consume_token(20);
+        jj_consume_token(21);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case DELIM:
           jj_consume_token(DELIM);
           break;
         default:
-          jj_la1[9] = jj_gen;
+          jj_la1[11] = jj_gen;
           ;
         }
         t = jj_consume_token(INTEGER);
-    PropSet ps = new PropSet();
-    ps.item.add(Integer.parseInt(t.image));
-        label_3:
-        while (true) {
-          if (jj_2_3(2)) {
-            ;
-          } else {
-            break label_3;
-          }
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case DELIM:
-            jj_consume_token(DELIM);
-            break;
-          default:
-            jj_la1[10] = jj_gen;
-            ;
-          }
-          jj_consume_token(21);
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case DELIM:
-            jj_consume_token(DELIM);
-            break;
-          default:
-            jj_la1[11] = jj_gen;
-            ;
-          }
-          t = jj_consume_token(INTEGER);
-    ps.item.add(Integer.parseInt(t.image));
-        }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DELIM:
-          jj_consume_token(DELIM);
-          break;
-        default:
-          jj_la1[12] = jj_gen;
-          ;
-        }
-        jj_consume_token(22);
-    {if (true) return ps;}
+    ps.item.set(Integer.parseInt(t.image));
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
         break;
-      case PROB:
-        jj_consume_token(PROB);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DELIM:
-          jj_consume_token(DELIM);
-          break;
-        default:
-          jj_la1[13] = jj_gen;
-          ;
-        }
-        t = jj_consume_token(COMP);
+      default:
+        jj_la1[12] = jj_gen;
+        ;
+      }
+      jj_consume_token(22);
+    {if (true) return ps;}
+      break;
+    case PROB:
+      jj_consume_token(PROB);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[13] = jj_gen;
+        ;
+      }
+      t = jj_consume_token(COMP);
     String comparator = t.image;
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DELIM:
-          jj_consume_token(DELIM);
-          break;
-        default:
-          jj_la1[14] = jj_gen;
-          ;
-        }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case FLOAT:
-          t = jj_consume_token(FLOAT);
-          break;
-        case INTEGER:
-          t = jj_consume_token(INTEGER);
-          break;
-        default:
-          jj_la1[15] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[14] = jj_gen;
+        ;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case FLOAT:
+        t = jj_consume_token(FLOAT);
+        break;
+      case INTEGER:
+        t = jj_consume_token(INTEGER);
+        break;
+      default:
+        jj_la1[15] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
     double prob = Double.parseDouble(t.image);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DELIM:
-          jj_consume_token(DELIM);
-          break;
-        default:
-          jj_la1[16] = jj_gen;
-          ;
-        }
-        jj_consume_token(18);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DELIM:
-          jj_consume_token(DELIM);
-          break;
-        default:
-          jj_la1[17] = jj_gen;
-          ;
-        }
-        if (jj_2_4(3)) {
-          p = stateFormula();
-        } else {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case NOT:
-          case TRUE:
-          case FALSE:
-          case PROB:
-          case NEXT:
-          case EVENTUALLY:
-          case ALWAYS:
-          case IDENT:
-          case 18:
-          case 20:
-            path = pathFormulaBinary();
-      p = new PropLTLPathWrapper(path);
-            break;
-          default:
-            jj_la1[18] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-        }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DELIM:
-          jj_consume_token(DELIM);
-          break;
-        default:
-          jj_la1[19] = jj_gen;
-          ;
-        }
-        jj_consume_token(19);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[16] = jj_gen;
+        ;
+      }
+      jj_consume_token(18);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[17] = jj_gen;
+        ;
+      }
+      p = stateFormula();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[18] = jj_gen;
+        ;
+      }
+      jj_consume_token(19);
     try
     {
       path = new PostProcessor().getPathFormula(p);
@@ -326,56 +304,15 @@ public class Parser implements ParserConstants {
       {if (true) throw new ParseException(e.getMessage());}
     }
     {if (true) return new PropProb(path, comparator, prob);}
-        break;
-      case NEXT:
-      case EVENTUALLY:
-      case ALWAYS:
-      case 18:
-        path = pathElement();
-    {if (true) return new PropLTLPathWrapper(path);}
-        break;
-      default:
-        jj_la1[20] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-    throw new Error("Missing return statement in function");
-  }
-
-  final public PathProperty pathElement() throws ParseException {
-  PathProperty p;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      break;
     case NEXT:
     case EVENTUALLY:
     case ALWAYS:
-      p = pathFormulaUnary();
-    {if (true) return p;}
-      break;
-    case 18:
-      jj_consume_token(18);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case DELIM:
-        jj_consume_token(DELIM);
-        break;
-      default:
-        jj_la1[21] = jj_gen;
-        ;
-      }
-      p = pathFormulaBinary();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case DELIM:
-        jj_consume_token(DELIM);
-        break;
-      default:
-        jj_la1[22] = jj_gen;
-        ;
-      }
-      jj_consume_token(19);
-    {if (true) return p;}
+      path = pathFormulaUnary();
+    {if (true) return new PropLTLPathWrapper(path);}
       break;
     default:
-      jj_la1[23] = jj_gen;
+      jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -393,7 +330,7 @@ public class Parser implements ParserConstants {
         jj_consume_token(DELIM);
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[20] = jj_gen;
         ;
       }
       p1 = stateElement();
@@ -406,7 +343,7 @@ public class Parser implements ParserConstants {
         jj_consume_token(DELIM);
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[21] = jj_gen;
         ;
       }
       p1 = stateElement();
@@ -419,79 +356,88 @@ public class Parser implements ParserConstants {
         jj_consume_token(DELIM);
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[22] = jj_gen;
         ;
       }
       p1 = stateElement();
     {if (true) return new PropNext(p1);}
       break;
     default:
-      jj_la1[27] = jj_gen;
+      jj_la1[23] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
     throw new Error("Missing return statement in function");
   }
 
-  final public PathProperty pathFormulaBinary() throws ParseException {
+  final public StateProperty pathTerm() throws ParseException {
   StateProperty p1,p2;
+  PathProperty path = null;
   Token t;
     p1 = stateElement();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case DELIM:
-      jj_consume_token(DELIM);
-      break;
-    default:
-      jj_la1[28] = jj_gen;
-      ;
-    }
-    jj_consume_token(UNTIL);
+    if (jj_2_4(2)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DELIM:
+        jj_consume_token(DELIM);
+        break;
+      default:
+        jj_la1[24] = jj_gen;
+        ;
+      }
+      jj_consume_token(UNTIL);
     boolean bounded = false;
     int bound = 0;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case DELIM:
-      jj_consume_token(DELIM);
-      break;
-    default:
-      jj_la1[29] = jj_gen;
-      ;
-    }
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case COMP:
-      t = jj_consume_token(COMP);
-      if (!t.image.equals("<")) {if (true) throw generateParseException();}
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DELIM:
         jj_consume_token(DELIM);
         break;
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[25] = jj_gen;
         ;
       }
-      t = jj_consume_token(INTEGER);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMP:
+        t = jj_consume_token(COMP);
+      if (!t.image.equals("<")) {if (true) throw generateParseException();}
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DELIM:
+          jj_consume_token(DELIM);
+          break;
+        default:
+          jj_la1[26] = jj_gen;
+          ;
+        }
+        t = jj_consume_token(INTEGER);
           bounded = true;
           bound = Integer.parseInt(t.image);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case DELIM:
-        jj_consume_token(DELIM);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DELIM:
+          jj_consume_token(DELIM);
+          break;
+        default:
+          jj_la1[27] = jj_gen;
+          ;
+        }
         break;
       default:
-        jj_la1[31] = jj_gen;
+        jj_la1[28] = jj_gen;
         ;
       }
-      break;
-    default:
-      jj_la1[32] = jj_gen;
-      ;
-    }
-    p2 = stateElement();
+      p2 = stateElement();
      if (bounded)
      {
-       {if (true) return new PropBoundedUntil(p1,p2,bound);}
+       path = new PropBoundedUntil(p1,p2,bound);
      } else
      {
-       {if (true) return new PropUntil(p1,p2);}
+       path = new PropUntil(p1,p2);
      }
+    } else {
+      ;
+    }
+    if (path==null)
+        {if (true) return p1;}
+    else
+        {if (true) return new PropLTLPathWrapper(path);}
     throw new Error("Missing return statement in function");
   }
 
@@ -523,50 +469,31 @@ public class Parser implements ParserConstants {
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_2_5(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_5(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(4, xla); }
-  }
-
-  private boolean jj_3R_12() {
-    if (jj_scan_token(PROB)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_scan_token(COMP)) return true;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(16)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(15)) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3R_14() {
+    if (jj_scan_token(PROB)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_18() {
+    if (jj_scan_token(ALWAYS)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_17() {
+    if (jj_scan_token(EVENTUALLY)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_16() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_15()) {
+    if (jj_3R_17()) {
     jj_scanpos = xsp;
-    if (jj_3R_16()) return true;
+    if (jj_3R_18()) {
+    jj_scanpos = xsp;
+    if (jj_3R_19()) return true;
     }
-    return false;
-  }
-
-  private boolean jj_3R_15() {
-    if (jj_3R_17()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_3R_5()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_scan_token(UNTIL)) return true;
+    }
     return false;
   }
 
@@ -592,103 +519,61 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_13() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
   private boolean jj_3R_4() {
     if (jj_3R_5()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_2()) { jj_scanpos = xsp; break; }
-    }
     return false;
   }
 
-  private boolean jj_3R_11() {
+  private boolean jj_3R_13() {
     if (jj_scan_token(20)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_scan_token(INTEGER)) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_3()) { jj_scanpos = xsp; break; }
-    }
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_scan_token(22)) return true;
     return false;
   }
 
-  private boolean jj_3R_20() {
-    if (jj_scan_token(NEXT)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_5()) return true;
+  private boolean jj_3R_6() {
+    if (jj_scan_token(COMP)) return true;
     return false;
   }
 
-  private boolean jj_3R_10() {
+  private boolean jj_3R_12() {
     if (jj_scan_token(IDENT)) return true;
     return false;
   }
 
-  private boolean jj_3R_9() {
+  private boolean jj_3R_15() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11() {
     if (jj_scan_token(FALSE)) return true;
     return false;
   }
 
-  private boolean jj_3R_19() {
-    if (jj_scan_token(ALWAYS)) return true;
+  private boolean jj_3_4() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_5()) return true;
+    if (jj_scan_token(UNTIL)) return true;
+    xsp = jj_scanpos;
+    if (jj_scan_token(2)) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_6()) jj_scanpos = xsp;
+    if (jj_3R_7()) return true;
     return false;
   }
 
-  private boolean jj_3R_8() {
+  private boolean jj_3R_10() {
     if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
-  private boolean jj_3_4() {
-    if (jj_3R_6()) return true;
+  private boolean jj_3R_5() {
+    if (jj_3R_7()) return true;
     return false;
   }
 
-  private boolean jj_3R_18() {
-    if (jj_scan_token(EVENTUALLY)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_17() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_18()) {
-    jj_scanpos = xsp;
-    if (jj_3R_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_7() {
+  private boolean jj_3R_9() {
     if (jj_scan_token(NOT)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_6()) return true;
     return false;
   }
 
@@ -703,13 +588,9 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_5() {
+  private boolean jj_3R_7() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_5()) {
-    jj_scanpos = xsp;
-    if (jj_3R_7()) {
-    jj_scanpos = xsp;
     if (jj_3R_8()) {
     jj_scanpos = xsp;
     if (jj_3R_9()) {
@@ -720,7 +601,11 @@ public class Parser implements ParserConstants {
     jj_scanpos = xsp;
     if (jj_3R_12()) {
     jj_scanpos = xsp;
-    if (jj_3R_13()) return true;
+    if (jj_3R_13()) {
+    jj_scanpos = xsp;
+    if (jj_3R_14()) {
+    jj_scanpos = xsp;
+    if (jj_3R_15()) return true;
     }
     }
     }
@@ -731,34 +616,13 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3_5() {
+  private boolean jj_3R_8() {
     if (jj_scan_token(18)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_6()) return true;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_scan_token(19)) return true;
     return false;
   }
 
-  private boolean jj_3R_6() {
-    if (jj_3R_4()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_1()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_16() {
-    if (jj_scan_token(18)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(2)) jj_scanpos = xsp;
-    if (jj_3R_21()) return true;
+  private boolean jj_3R_19() {
+    if (jj_scan_token(NEXT)) return true;
     return false;
   }
 
@@ -773,15 +637,15 @@ public class Parser implements ParserConstants {
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[33];
+  final private int[] jj_la1 = new int[29];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x18000,0x4,0x4,0x160fc8,0x4,0x160fc8,0x4,0x4,0x40e00,0x4,0x4,0x4,0xe00,0x4,0x4,0x4,0x4,0x2000,};
+      jj_la1_0 = new int[] {0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x4,0x18000,0x4,0x4,0x4,0x160fc8,0x4,0x4,0x4,0xe00,0x4,0x4,0x4,0x4,0x2000,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[5];
+  final private JJCalls[] jj_2_rtns = new JJCalls[4];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -796,7 +660,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -811,7 +675,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -822,7 +686,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -833,7 +697,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -843,7 +707,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -853,7 +717,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -970,7 +834,7 @@ public class Parser implements ParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 33; i++) {
+    for (int i = 0; i < 29; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1006,7 +870,7 @@ public class Parser implements ParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1017,7 +881,6 @@ public class Parser implements ParserConstants {
             case 1: jj_3_2(); break;
             case 2: jj_3_3(); break;
             case 3: jj_3_4(); break;
-            case 4: jj_3_5(); break;
           }
         }
         p = p.next;

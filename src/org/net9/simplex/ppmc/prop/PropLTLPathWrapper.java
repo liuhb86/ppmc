@@ -11,5 +11,10 @@ public class PropLTLPathWrapper extends StateProperty {
 	public Object accept(PropertyVisitor visitor) {
 		return visitor.visit(this);
 	}
+	
+	public void print(){
+		System.out.print("PATHWRAPPER ");
+		p1.print();
+	}
 
 }

@@ -46,24 +46,24 @@ StateProperty stateFormula() :
   )*
   {    return p1;
   }
-}
+}
 StateProperty stateTerm() :
 {
   StateProperty p1,p2;  PropAnd p = null;}
 {
-  p1 = stateElement()  (    LOOKAHEAD(2)    [< DELIM >] < AND > [< DELIM >]
-    p2 = stateElement()
+  p1 = pathTerm()  (    LOOKAHEAD(2)    [< DELIM >] < AND > [< DELIM >]
+    p2 = pathTerm()
   {  	if (p==null) {  		p = new PropAnd(p1,p2);  		p1 = p;  	} else {  		p.item.add(p2);  	}
   }
   )*
   {    return p1;
-  }}
+  }}
 StateProperty stateElement() :
 {
   StateProperty p;  PathProperty path;
   Token t;
 }
-{  LOOKAHEAD(3)
+{
   "(" [< DELIM >]
   p = stateFormula()
   [< DELIM >] ")"
@@ -75,4 +75,4 @@ StateProperty stateElement() :
 | t = < IDENT >
   {
 	return new PropAtom(t.image);
-  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.add(Integer.parseInt(t.image));  }  (  LOOKAHEAD(2)  [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.add(Integer.parseInt(t.image));  }  )* [<DELIM >] "}"  {    return ps;  }| < PROB > [<DELIM >]  t = < COMP >  {    String comparator = t.image;  }  [<DELIM >] (    t = < FLOAT >    |    t = < INTEGER >  )  {    double prob = Double.parseDouble(t.image);  }  [<DELIM >] "("  [<DELIM >]  (    LOOKAHEAD(3)    p = stateFormula()    |      path = pathFormulaBinary()    {      p = new PropLTLPathWrapper(path);    }  )  [<DELIM >] ")"  {    try    {      path = new PostProcessor().getPathFormula(p);    } catch (java.text.ParseException e)    {      throw new ParseException(e.getMessage());    }    return new PropProb(path, comparator, prob);  }| path = pathElement()  {    return new PropLTLPathWrapper(path);  }}PathProperty pathElement():{  PathProperty p;}{  p = pathFormulaUnary()  {    return p;  }| "(" [< DELIM >]  p = pathFormulaBinary()  [< DELIM >] ")"  {    return p;  }}PathProperty pathFormulaUnary():{  StateProperty p1,p2;  Token t;}{  < EVENTUALLY > [<DELIM >]  p1 =stateElement()  {    return new PropEventually(p1);  }| < ALWAYS > [<DELIM >]  p1 =stateElement()  {    return new PropAlways(p1);  }|  < NEXT > [<DELIM >]  p1 = stateElement()  {    return new PropNext(p1);  }}PathProperty pathFormulaBinary():{  StateProperty p1,p2;  Token t;}{  p1 = stateElement()  [<DELIM >] < UNTIL >  {    boolean bounded = false;    int bound = 0;  }  [<DELIM >]  [ t = < COMP >    {      if (!t.image.equals("<")) throw generateParseException();    }    [<DELIM >]	t = < INTEGER >	{	  bounded = true;	  bound = Integer.parseInt(t.image);	}	[<DELIM >]  ]  p2 = stateElement()  {     if (bounded)     {       return new PropBoundedUntil(p1,p2,bound);     } else     {       return new PropUntil(p1,p2);     }  }}
+  } | "{" [<DELIM>]  t = <INTEGER>  {    PropSet ps = new PropSet();    ps.item.set(Integer.parseInt(t.image));  }  (  LOOKAHEAD(2)  [<DELIM>] "," [<DELIM>]  t = <INTEGER>  {    ps.item.set(Integer.parseInt(t.image));  }  )* [<DELIM >] "}"  {    return ps;  }| < PROB > [<DELIM >]  t = < COMP >  {    String comparator = t.image;  }  [<DELIM >] (    t = < FLOAT >    |    t = < INTEGER >  )  {    double prob = Double.parseDouble(t.image);  }  [<DELIM >] "("  [<DELIM >]    p = stateFormula()  [<DELIM >] ")"  {    try    {      path = new PostProcessor().getPathFormula(p);    } catch (java.text.ParseException e)    {      throw new ParseException(e.getMessage());    }    return new PropProb(path, comparator, prob);  }| path = pathFormulaUnary()  {    return new PropLTLPathWrapper(path);  }}PathProperty pathFormulaUnary():{  StateProperty p1,p2;  Token t;}{  < EVENTUALLY > [<DELIM >]  p1 =stateElement()  {    return new PropEventually(p1);  }| < ALWAYS > [<DELIM >]  p1 =stateElement()  {    return new PropAlways(p1);  }|  < NEXT > [<DELIM >]  p1 = stateElement()  {    return new PropNext(p1);  }}StateProperty pathTerm():{  StateProperty p1,p2;  PathProperty path = null;  Token t;}{  p1 = stateElement()  [     LOOKAHEAD(2)     [<DELIM >] < UNTIL >  {    boolean bounded = false;    int bound = 0;  }  [<DELIM >]  [ t = < COMP >    {      if (!t.image.equals("<")) throw generateParseException();    }    [<DELIM >]	t = < INTEGER >	{	  bounded = true;	  bound = Integer.parseInt(t.image);	}	[<DELIM >]  ]  p2 = stateElement()  {     if (bounded)     {       path = new PropBoundedUntil(p1,p2,bound);     } else     {       path = new PropUntil(p1,p2);     }  }]  {    if (path==null)    	return p1;    else    	return new PropLTLPathWrapper(path);  }}

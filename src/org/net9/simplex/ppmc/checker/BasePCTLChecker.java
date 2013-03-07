@@ -156,9 +156,9 @@ public abstract class BasePCTLChecker implements ModelChecker {
 	@Override
 	public Object visit(PropSet p) {
 		if (isNested){
-			return new SetSolver(p.item, model.size());
+			return new SetSolver(p.item);
 		} else {
-			return this.getConstSolver(p.item.contains(initState));
+			return this.getConstSolver(p.item.get(initState));
 		}
 	}
 	
