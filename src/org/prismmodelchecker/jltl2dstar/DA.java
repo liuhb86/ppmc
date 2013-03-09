@@ -281,8 +281,9 @@ public class DA {
 		out.println("---");
 
 		for (int i_state = 0; i_state < _index.size(); i_state++) {
-			DA_State cur_state = _index.get(i_state);
-			out.print("State: " + i_state);
+			DA_State cur_state =  _index.get(i_state);
+			//PPMC: modified to see name
+			out.print("State: " + i_state + " \""+cur_state.getName()+"\"");
 			if (cur_state.hasDescription()) {
 				out.print(" \"" + cur_state.getDescription() + "\"");
 			}

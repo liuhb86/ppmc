@@ -42,7 +42,9 @@ public class Generalized {
 	private GState gremoved;
 	private GScc scc_stack;
 	private int gstate_id;
+	@SuppressWarnings("unused")
 	private int gstate_count;
+	@SuppressWarnings("unused")
 	private int gtrans_count;
 	private int rank;
 	private int scc_id;

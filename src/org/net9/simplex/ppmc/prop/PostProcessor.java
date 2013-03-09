@@ -22,7 +22,6 @@ public class PostProcessor implements PropertyVisitor {
 	}
 	
 	public PathProperty getPathFormula(StateProperty p) throws ParseException {
-		p.print();
 		reset();
 		p.accept(this);
 		if (hasProb) throw new ParseException("Nested Probability Operator", 0);

@@ -47,7 +47,9 @@ public class Buchi {
 	private BState bremoved;
 	private BScc scc_stack;
 	private int accept;
+	@SuppressWarnings("unused")
 	private int bstate_count;
+	@SuppressWarnings("unused")
 	private int btrans_count;
 	private int rank;
 	

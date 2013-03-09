@@ -23,17 +23,16 @@ package org.prismmodelchecker.jltl2dstar;
 
 import org.prismmodelchecker.prism.PrismException;
 
-import java.util.BitSet;
-
 import org.prismmodelchecker.jltl2ba.APSet;
 import org.prismmodelchecker.jltl2ba.SimpleLTL;
 
 public class LTL2Rabin {
 	
-	public static prism.DRA<BitSet> ltl2rabin(SimpleLTL ltlFormula) throws PrismException {
+	//PPMC: unused method
+	/*public static prism.DRA<BitSet> ltl2rabin(SimpleLTL ltlFormula) throws PrismException {
 		SimpleLTL ltl = ltlFormula.simplify();
 		return ltl2rabin(ltl, ltl.getAPs()).createPrismDRA();
-	}
+	}*/
 	
 	public static DRA ltl2rabin(SimpleLTL ltl, APSet apset) throws PrismException {
 		DRA dra = null;

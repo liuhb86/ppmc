@@ -21,15 +21,10 @@
 
 package org.prismmodelchecker.jltl2dstar;
 
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.PrintStream;
 import java.util.*;
 
-import org.prismmodelchecker.jltl2ba.APElement;
 import org.prismmodelchecker.jltl2ba.APSet;
-
-
 import org.prismmodelchecker.prism.PrismException;
 
 /**
@@ -145,9 +140,10 @@ public class DRA extends DA {
 	}
 
 	/**
-	 * Convert the DRA from jltl2dstar to PRISM data structures.  
+	 * Convert the DRA from jltl2dstar to PRISM data structures.
+	 * PPMC: unused method  
 	 */
-	public prism.DRA<BitSet> createPrismDRA() throws PrismException
+	/*public prism.DRA<BitSet> createPrismDRA() throws PrismException
 	{
 		int i, k, numLabels, numStates, src, dest;
 		List<String> apList;
@@ -191,7 +187,7 @@ public class DRA extends DA {
 		}
 		
 		return draNew;
-	}
+	}*/
 	
 	//	public DRA calculateUnionStuttered(DRA other,
 	//			StutterSensitivenessInformation stutter_information,

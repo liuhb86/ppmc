@@ -26,6 +26,7 @@
 
 package org.prismmodelchecker.prism;
 
+@SuppressWarnings("serial")
 public class PrismException extends Exception
 {
 

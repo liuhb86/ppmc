@@ -25,7 +25,6 @@ import java.util.*;
 import org.prismmodelchecker.jltl2ba.APElement;
 import org.prismmodelchecker.jltl2ba.APSet;
 import org.prismmodelchecker.jltl2ba.MyBitSet;
-import org.prismmodelchecker.jltl2ba.MyBitSet.MyBitSetIterator;
 
 
 

@@ -41,6 +41,7 @@ public class RabinAcceptance implements Iterable<Integer> {
 	public enum RabinColor {RABIN_WHITE, RABIN_GREEN, RABIN_RED};
 	
 	/** The number of acceptance pairs */
+	@SuppressWarnings("unused")
 	private int _acceptance_count;
 		    
 	/** A vector of MyBitSet* representing the L part of the acceptance pairs. */

@@ -172,6 +172,7 @@ recursive:
 					}
 				}
 			}
+			//TODO: whether to remove self?
 			bscc.next.remove(bscc);
 			if (bscc.next.size()==0) {
 				ergoric.add(bscc);
