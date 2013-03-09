@@ -240,9 +240,10 @@ public abstract class BasePCTLChecker implements ModelChecker {
 
 	@Override
 	public Object visit(PropLTLPathWrapper p) {
+		// As PropLTLPathWrapp will be embedded in the PropLTL when parsing Prob operator, 
+		// it should not be handled by model checkers.
 		throw new IllegalArgumentException();
-	}
-	
+	}	
 
 	@Override
 	public Object visit(PropLTL p) {
