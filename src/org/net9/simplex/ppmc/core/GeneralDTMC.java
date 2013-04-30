@@ -22,9 +22,9 @@ public class GeneralDTMC implements DTMC {
 	HashMap<String, BitSet> ap;
 	public SimpleDTMC absorbingTrans;
 	public int[] reorderMap;
-	public BSCC[] bsccMap;
-	public HashSet<BSCC> bsccSet = new HashSet<BSCC>();
-	public BSCC[] ergoric;
+	public SCC[] bsccMap;
+	public HashSet<SCC> bsccSet = new HashSet<SCC>();
+	public SCC[] ergoric;
 
 	public GeneralDTMC(SmartMatrix trans,int initial, HashMap<String, BitSet> ap){
 		this.initialState = initial;
@@ -43,61 +43,63 @@ public class GeneralDTMC implements DTMC {
 		boolean [] visited = new boolean[trans.getDim()];
 		for(int i=0;i<visited.length;++i) visited[i]=false;
 		int curLabel = 0;
-		if (trans.getDim()>0){
-			stack.push(0);
-			varStack.push(null);
-		}
 		
+		
+		for (int i=0;i<trans.getDim();++i){
+			if(visited[i]) continue;
+			stack.push(i);
+			varStack.push(null);	
 recursive:	
-		while(!stack.empty()){
-			int u = stack.peek();
-			int v;
-			Integer nv = varStack.peek();
-			if (nv==null) {
-				visited[u] = true;
-				label[u]=curLabel;
-				group[u]=curLabel;
-				++curLabel;
-				sStack.push(u);
-				sSet.add(u);
-				v=0;
-			} else {
-				v = nv;
-				if (group[v]<group[u]) group[u]=group[v];
-				v = v+1;
-			}
-			for (;v<trans.getDim();++v){
-				if (trans.getNumericEntry(u, v)==0) continue;
-				if (!visited[v]){
-					stack.push(v);
-					varStack.pop();
-					varStack.push(v);
-					varStack.push(null);
-					continue recursive;
-				} else if (sSet.contains(v)) {
-					if (label[v]<group[u]) {
-						group[u]=label[v];
+			while(!stack.empty()){
+				int u = stack.peek();
+				int v;
+				Integer nv = varStack.peek();
+				if (nv==null) {
+					visited[u] = true;
+					label[u]=curLabel;
+					group[u]=curLabel;
+					++curLabel;
+					sStack.push(u);
+					sSet.add(u);
+					v=0;
+				} else {
+					v = nv;
+					if (group[v]<group[u]) group[u]=group[v];
+					v = v+1;
+				}
+				for (;v<trans.getDim();++v){
+					if (trans.getNumericEntry(u, v)==0) continue;
+					if (!visited[v]){
+						stack.push(v);
+						varStack.pop();
+						varStack.push(v);
+						varStack.push(null);
+						continue recursive;
+					} else if (sSet.contains(v)) {
+						if (label[v]<group[u]) {
+							group[u]=label[v];
+						}
 					}
 				}
+				if (label[u]==group[u]){
+					SCC bscc = new SCC();
+					do {
+						v = sStack.pop();
+						sSet.remove(v);
+						bscc.states.add(v);
+						bsccMap[v]=bscc;
+					} while(u!=v);
+					bscc.index = bsccSet.size();
+					bsccSet.add(bscc);
+				}
+				stack.pop();
+				varStack.pop();
 			}
-			if (label[u]==group[u]){
-				BSCC bscc = new BSCC();
-				do {
-					v = sStack.pop();
-					sSet.remove(v);
-					bscc.states.add(v);
-					bsccMap[v]=bscc;
-				} while(u!=v);
-				bsccSet.add(bscc);
-			}
-			stack.pop();
-			varStack.pop();
 		}
 	}
-	
 	void buildAbsorbingTrans(){
 		int nErgoricStates = 0;
-		for(BSCC bscc:ergoric){
+		for(SCC bscc:ergoric){
 			nErgoricStates+=bscc.states.size();
 		}
 		int nTransients = this.size()-nErgoricStates;
@@ -113,6 +115,7 @@ recursive:
 			}
 		}
 		XJep jep = new XJep();
+		jep.setAllowUndeclared(true);
 		double[][] transition = new double[nStates][nStates];
 		SparseMatrix<String> vars = new SparseMatrix<String>();
 		for(int i=0;i<nStates;++i)
@@ -158,11 +161,22 @@ recursive:
 		this.absorbingTrans = new SimpleDTMC(transition,vars, nTransients, reorderMap[this.initialState],new HashMap<String, BitSet>());
 	}
 	void init() {
-		this.bsccMap = new BSCC[trans.getDim()];
+		this.bsccMap = new SCC[trans.getDim()];
 		tarjan();
-		HashSet<BSCC> visited = new HashSet<BSCC>();
-		ArrayList<BSCC> ergoric = new ArrayList<BSCC>();
-		for(BSCC bscc:bsccMap){
+		//trans.writeTo(new PrintWriter(System.out));
+		/*for(SCC bscc:bsccSet){
+			System.out.print(bscc.index+ ":");
+			for(int i:bscc.states) System.out.print(i+" ");
+			System.out.println();
+		}
+		for (SCC bscc:bsccMap){
+			System.out.print((bscc==null?bscc:bscc.index)+" ");
+		}
+		System.out.println();
+		*/
+		HashSet<SCC> visited = new HashSet<SCC>();
+		ArrayList<SCC> ergoric = new ArrayList<SCC>();
+		for(SCC bscc:bsccMap){
 			if (visited.contains(bscc)) continue;
 			visited.add(bscc);
 			for(int s:bscc.states){
@@ -176,10 +190,11 @@ recursive:
 			bscc.next.remove(bscc);
 			if (bscc.next.size()==0) {
 				ergoric.add(bscc);
+				//System.out.println(bscc.index);
 			}
 		}
 
-		this.ergoric = (BSCC[]) ergoric.toArray(new BSCC[ergoric.size()]);
+		this.ergoric = (SCC[]) ergoric.toArray(new SCC[ergoric.size()]);
 		for(int i=0;i<this.ergoric.length;++i) {
 			this.ergoric[i].index = i;
 		}

@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.ParseException;
 
-import org.net9.simplex.ppmc.core.BSCC;
+import org.net9.simplex.ppmc.core.SCC;
 import org.net9.simplex.ppmc.core.GeneralDTMC;
 import org.net9.simplex.ppmc.util.Stdio;
 
@@ -23,7 +23,7 @@ public class GeneralDTMCTest {
 			Stdio.out.println("parse error: "+e.getMessage());
 			return;
 		}
-		for(BSCC bscc:model.bsccSet){
+		for(SCC bscc:model.bsccSet){
 			Stdio.out.println(bscc.states);
 		}
 	}
