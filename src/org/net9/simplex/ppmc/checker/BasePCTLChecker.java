@@ -167,18 +167,25 @@ public abstract class BasePCTLChecker implements ModelChecker {
 		p.isNested = this.isNested;
 		this.isNested = true;
 		
-		ExpressionSolver s = (ExpressionSolver) p.p1.accept(this);;
-		s.setConstraints(p.strComparator, p.comparator, p.prob);
-		Solver r = s;
+		Solver s = (Solver) p.p1.accept(this);;
+		if (s instanceof ExpressionSolver) {
+			ExpressionSolver r = (ExpressionSolver) s;
+			r.setConstraints(p.strComparator, p.comparator, p.prob);
+		}
 		if (s.isConstant()){
-			if (s.isSingle()) {
-				r = this.getConstSolver(s.solve(null));
+			if (s instanceof ExpressionSolver) {
+				ExpressionSolver r = (ExpressionSolver) s;		
+				if (r.isSingle()) {
+					s = this.getConstSolver(s.solve(null));
+				} else {
+					s = this.getSetSolver(s);
+				}
 			} else {
-				r = this.getSetSolver(s);
+				s = this.getConstSolver(s.solve(null));
 			}
 		}
 		this.isNested = p.isNested;
-		return r;
+		return s;
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public class LTLChecker {
 		DRA dra;
 		try {
 			dra = LTL2Rabin.ltl2rabin(ltl, apSet);
-			dra.print(System.out);
+			//dra.print(System.out);
 		} catch (PrismException e1) {
 			throw new IllegalArgumentException("Cannot convert LTL to DRA.");
 		}
