@@ -17,7 +17,7 @@ TOKEN :
 | < TRUE : "true" >
 | < FALSE : "false" >
 | < PROB : "P" >
-}TOKEN : {  < NEXT : "X" >| < EVENTUALLY : "<>" >| < ALWAYS : "[]" >| < UNTIL : "U" >}TOKEN :{  < COMP : "<=" | "<" | ">=" |">" >
+}TOKEN : {  < NEXT : "X" >| < EVENTUALLY : "<>" | "F" >| < ALWAYS : "[]" | "G" >| < UNTIL : "U" >}TOKEN :{  < COMP : "<=" | "<" | ">=" |">" >
 | <#DIGIT : ["0" - "9"] >
 | <INTEGER : (<DIGIT>)+ >
 | <FLOAT : (<DIGIT>)* "." (<DIGIT>)+>

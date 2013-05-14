@@ -53,6 +53,7 @@ public class SimpleLTLConverter implements PropertyVisitor {
 		if (!apMap.containsKey(p)) {
 			apMap.put(ap, null);
 			apSet.addAP(ap);
+			subFormulaMap.put(ap, p);
 		}
 		return new SimpleLTL(ap);
 	}

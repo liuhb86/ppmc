@@ -158,6 +158,10 @@ recursive:
 				}
 			}
 		}
+		
+		for(int i=nTransients;i<nStates;++i){
+			transition[i][i]=1;
+		}
 		this.absorbingTrans = new SimpleDTMC(transition,vars, nTransients, reorderMap[this.initialState],new HashMap<String, BitSet>());
 	}
 	void init() {

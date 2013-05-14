@@ -41,7 +41,6 @@ public abstract class BasePCTLChecker implements ModelChecker {
 				UnsupportedOperationException {
 		initState = model.getInitState();
 		isNested = false;
-		p.accept(this);
 		return s(p.accept(this));
 	}
 	

@@ -18,6 +18,8 @@ public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 		int newSize = sm.getDim();
 		this.sAccept = model.size();
 		this.sReject = model.size()+1;
+		sm.setEntry(sAccept,sAccept,1);
+		sm.setEntry(sReject,sReject,1);
 		BitSet union = (BitSet) accept.clone();
 		union.or(reject);
 		for(int k=union.nextSetBit(0);k>=0;k=union.nextSetBit(k+1)){
@@ -29,9 +31,9 @@ public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 				sm.setEntry(k, sReject, 1);
 		}
 		this.trans = sm;
-		this.numTransients = 2;
+		//this.numTransients = 2;
 		this.currentState = model.getInitState();
-		this.ap = model.getAP();
+		//this.ap = model.getAP();
 		if (reorder){
 			this.reorder((SimpleDTMC) model, accept, reject);
 		} else {
@@ -54,13 +56,15 @@ public class ReorderedAbsorbingDTMC extends SimpleDTMC{
 				++nTransient;
 				continue;
 			}
-			if (!(accept.get(i) || reject.get(i))) {
+			if (!(accept.get(j) || reject.get(j))) {
 				--j;
 				continue;
 			}
 			++nTransient;
 			reorderMap.put(i, j);
 			reorderMap.put(j, i);
+			++i;
+			--j;
 		}
 		if (i==j && (accept.get(i) || reject.get(i))) {++nTransient;}
 		this.trans.exchange(reorderMap, reorderMap);

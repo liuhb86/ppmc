@@ -106,9 +106,12 @@ public class SimpleReachabilityChecker {
 			if(model.getTrans().getNumericEntry(i, to)!=0){
 				String n = this.getCofactor(i, from);
 				if (!n.equals("0")) {
-					char coef=(from+i)%2==0?'+':'-';
+					/*char coef=(from+i)%2==0?'+':'-';
 					num.append(coef).append('(').append(n).append(")*")
 						.append(model.getTrans().getEntry(i, to, true));
+					*/
+					num.append("+(").append(n).append(")*")
+					.append(model.getTrans().getEntry(i, to, true));
 				}
 			}
 		}

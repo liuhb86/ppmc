@@ -30,4 +30,8 @@ public class MatrixIndex implements Comparable<MatrixIndex>{
 	public int hashCode() {
 		return Utils.hashPair(row, col);
 	}
+	
+	public String toString() {
+		return String.format("<%s,%s>",row,col);
+	}
 }

@@ -12,6 +12,7 @@ public class NextChecker {
 	XJep jep = new XJep();
 	public NextChecker (SmartMatrix trans) {
 		this.trans = trans;
+		jep.setAllowUndeclared(true);
 	}
 	
 	public Node check (int from, BitSet to) {
