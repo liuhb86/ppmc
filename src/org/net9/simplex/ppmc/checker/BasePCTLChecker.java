@@ -209,12 +209,18 @@ public abstract class BasePCTLChecker implements ModelChecker {
 			throw new UnsupportedOperationException();
 		}
 		
+		BitSet dest = s.solveSet(null);
+		NextChecker nextChecker = this.getNextChecker();
+		
 		if (p.parent.isNested) {
-			// TODO : return set solver
-			throw new UnsupportedOperationException();
+			int sz = model.size();
+			Node[] exp = new Node[sz];
+			for(int i=0;i<sz;++i){
+				exp[i] = nextChecker.check(i, dest);
+			}
+			return new ExpressionSolver(exp);
 		} else {
-			NextChecker nextChecker = this.getNextChecker();
-			Node exp = nextChecker.check(this.initState, s.solveSet(null));
+			Node exp = nextChecker.check(this.initState, dest);
 			return new ExpressionSolver(exp);
 		}
 	}
